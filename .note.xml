@@ -1,0 +1,7 @@
+<note title="Discussion Venues" removeInRFC="true">
+<t>Discussion of this document takes place on the
+  NWCRG Working Group mailing list (nwcrg@ietf.org),
+  which is archived at <eref target="https://mailarchive.ietf.org/arch/browse/nwcrg/"/>.</t>
+<t>Source for this draft and an issue tracker can be found at
+  <eref target="https://github.com/francoismichel/draft-irtf-nwcrg-coding-and-congestion-in-transport"/>.</t>
+</note>

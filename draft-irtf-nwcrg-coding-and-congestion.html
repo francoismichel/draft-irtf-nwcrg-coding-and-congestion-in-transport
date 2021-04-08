@@ -10,30 +10,29 @@
 <meta content="Francois Michel" name="author">
 <meta content="Michael Welzl" name="author">
 <meta content="
-       Forward Erasure Correction (FEC) is a reliability mechanism that is distinct and separate from the retransmission logic in reliable transfer protocols such as TCP. Using FEC coding can help deal with transfer tail losses or with networks having non-congestion losses. However, FEC coding mechanisms should not hide congestion signals. This memo offers a discussion of how FEC coding and congestion control can coexist. Another objective is to encourage the research community to also consider congestion control aspects when proposing and comparing FEC coding solutions in communication systems. 
+       Forward Erasure Correction (FEC) is a reliability mechanism that is distinct and separate from the retransmission logic in reliable transfer protocols such as TCP. FEC coding can help deal with losses at the end of transfers or with networks having non-congestion losses. However, FEC coding mechanisms should not hide congestion signals. This memo offers a discussion of how FEC coding and congestion control can coexist. Another objective is to encourage the research community to also consider congestion control aspects when proposing and comparing FEC coding solutions in communication systems. 
        This document is the product of the Coding for Efficient Network Communications Research Group (NWCRG). The scope of the document is end-to-end communications: FEC coding for tunnels is out-of-the scope of the document. 
     " name="description">
-<meta content="xml2rfc 3.3.0" name="generator">
+<meta content="xml2rfc 3.6.0" name="generator">
 <meta content="Coding, congestion" name="keyword">
-<meta content="draft-irtf-nwcrg-coding-and-congestion-05" name="ietf.draft">
+<meta content="draft-irtf-nwcrg-coding-and-congestion-08" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.3.0
-    Python 3.8.3
+  xml2rfc 3.6.0
+    Python 3.8.8
     appdirs 1.4.4
     ConfigArgParse 1.2.3
     google-i18n-address 2.4.0
-    html5lib 1.0.1
+    html5lib 1.1
     intervaltree 3.1.0
     Jinja2 2.11.2
     kitchen 1.2.6
-    lxml 4.4.1
-    pycairo 1.18.2
+    lxml 4.6.3
     pycountry 20.7.3
     pyflakes 2.2.0
-    PyYAML 5.3.1
-    requests 2.22.0
-    setuptools 47.3.1
-    six 1.14.0
+    PyYAML 5.4.1
+    requests 2.25.1
+    setuptools 51.3.3
+    six 1.15.0
 -->
 <link href="draft-irtf-nwcrg-coding-and-congestion.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -46,7 +45,23 @@ html {
   --link-color: #2a6496;
   --highlight-color: #f9f9f9;
   --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
   --small-font-size: 14.5px;
+  scrollbar-color: #bbb #eee;
+}
+@media (prefers-color-scheme: dark) {
+html {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
 }
 body {
   max-width: 600px;
@@ -78,11 +93,11 @@ body {
 }
 h1, h2, h3 {
   font-size: 22px;
-  line-height: 26px;
+  line-height: 27px;
 }
 h4, h5, h6 {
-  font-size: 18px;
-  line-height: 22px;
+  font-size: 20px;
+  line-height: 24px;
 }
 
 /* general structure */
@@ -238,6 +253,7 @@ img {
 }
 figure {
   margin: 0.5em 0;
+  padding: 0;
 }
 figure blockquote {
   margin: 0.8em 0.4em 0.4em;
@@ -262,10 +278,6 @@ figcaption, caption {
     display: inline-block;
     vertical-align: text-bottom;
     padding-bottom: 8px;
-  }
-  table {
-    display: inline-block;
-    overflow-x: auto;
   }
 }
 
@@ -337,17 +349,23 @@ table p {
 /* pilcrow */
 a.pilcrow {
   margin-left: 3px;
-  visibility: hidden;
+  opacity: 0.2;
   user-select: none;
 }
-a.pilcrow[href] { color: #ddd; }
+a.pilcrow[href] { color: var(--pilcrow-weak); }
 a.pilcrow[href]:hover { text-decoration: none; }
-@media screen {
+@media not print {
   :hover > a.pilcrow {
-    visibility: visible;
+    opacity: 1;
   }
-  a.pilcrow:hover {
+  a.pilcrow[href]:hover {
+    color: var(--pilcrow-strong);
     background-color: transparent;
+  }
+}
+@media print {
+  a.pilcrow {
+    display: none;
   }
 }
 
@@ -823,11 +841,11 @@ address div.right {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">Coding and congestion</td>
-<td class="right">October 2020</td>
+<td class="right">April 2021</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Kuhn, et al.</td>
-<td class="center">Expires 3 May 2021</td>
+<td class="center">Expires 10 October 2021</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -837,15 +855,15 @@ address div.right {
 <dt class="label-workgroup">Workgroup:</dt>
 <dd class="workgroup">NWCRG</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-irtf-nwcrg-coding-and-congestion-05</dd>
+<dd class="internet-draft">draft-irtf-nwcrg-coding-and-congestion-08</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2020-10-30" class="published">30 October 2020</time>
+<time datetime="2021-04-08" class="published">8 April 2021</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2021-05-03">3 May 2021</time></dd>
+<dd class="expires"><time datetime="2021-10-10">10 October 2021</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -870,7 +888,7 @@ address div.right {
 <h1 id="title">Coding and congestion control in transport</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">Forward Erasure Correction (FEC) is a reliability mechanism that is distinct and separate from the retransmission logic in reliable transfer protocols such as TCP. Using FEC coding can help deal with transfer tail losses or with networks having non-congestion losses. However, FEC coding mechanisms should not hide congestion signals. This memo offers a discussion of how FEC coding and congestion control can coexist. Another objective is to encourage the research community to also consider congestion control aspects when proposing and comparing FEC coding solutions in communication systems.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">Forward Erasure Correction (FEC) is a reliability mechanism that is distinct and separate from the retransmission logic in reliable transfer protocols such as TCP. FEC coding can help deal with losses at the end of transfers or with networks having non-congestion losses. However, FEC coding mechanisms should not hide congestion signals. This memo offers a discussion of how FEC coding and congestion control can coexist. Another objective is to encourage the research community to also consider congestion control aspects when proposing and comparing FEC coding solutions in communication systems.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <p id="section-abstract-2">This document is the product of the Coding for Efficient Network Communications Research Group (NWCRG). The scope of the document is end-to-end communications: FEC coding for tunnels is out-of-the scope of the document.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
@@ -892,7 +910,7 @@ address div.right {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 3 May 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 10 October 2021.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -901,7 +919,7 @@ address div.right {
 <a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
         </h2>
 <p id="section-boilerplate.2-1">
-            Copyright (c) 2020 IETF Trust and the persons identified as the
+            Copyright (c) 2021 IETF Trust and the persons identified as the
             document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.2-2">
             This document is subject to BCP 78 and the IETF Trust's Legal
@@ -920,138 +938,144 @@ address div.right {
         <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
 <a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
         </h2>
-<nav class="toc"><ul class="ulEmpty compact toc">
-<li class="ulEmpty compact toc" id="section-toc.1-1.1">
-            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction" class="xref">Introduction</a><a href="#section-toc.1-1.1.1" class="pilcrow">¶</a></p>
+<nav class="toc"><ul class="ulEmpty toc compact">
+<li class="ulEmpty toc compact" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="xref">1</a>.  <a href="#name-introduction" class="xref">Introduction</a></p>
 </li>
-          <li class="ulEmpty compact toc" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="xref">2</a>.  <a href="#name-separate-channels-separate-" class="xref">Separate channels, separate entities</a><a href="#section-toc.1-1.2.1" class="pilcrow">¶</a></p>
+          <li class="ulEmpty toc compact" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="xref">2</a>.  <a href="#name-context" class="xref">Context</a></p>
+<ul class="ulEmpty toc compact">
+<li class="ulEmpty toc compact" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="xref">2.1</a>.  <a href="#name-separate-channels-separate-" class="xref">Separate channels, separate entities</a></p>
 </li>
-          <li class="ulEmpty compact toc" id="section-toc.1-1.3">
-            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-fec-above-the-transport" class="xref">FEC above the transport</a><a href="#section-toc.1-1.3.1" class="pilcrow">¶</a></p>
-<ul class="ulEmpty compact toc">
-<li class="ulEmpty compact toc" id="section-toc.1-1.3.2.1">
-                <p id="section-toc.1-1.3.2.1.1" class="keepWithNext"><a href="#section-3.1" class="xref">3.1</a>.  <a href="#name-flowchart" class="xref">Flowchart</a><a href="#section-toc.1-1.3.2.1.1" class="pilcrow">¶</a></p>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1" class="keepWithNext"><a href="#section-2.2" class="xref">2.2</a>.  <a href="#name-relation-between-transport-" class="xref">Relation between transport layer and application requirements</a></p>
 </li>
-              <li class="ulEmpty compact toc" id="section-toc.1-1.3.2.2">
-                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="xref">3.2</a>.  <a href="#name-discussion" class="xref">Discussion</a><a href="#section-toc.1-1.3.2.2.1" class="pilcrow">¶</a></p>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.2.2.3">
+                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="xref">2.3</a>.  <a href="#name-transport-multipath" class="xref">Transport multipath</a></p>
 </li>
-            </ul>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.2.2.4">
+                <p id="section-toc.1-1.2.2.4.1"><a href="#section-2.4" class="xref">2.4</a>.  <a href="#name-types-of-coding" class="xref">Types of coding</a></p>
 </li>
-          <li class="ulEmpty compact toc" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-fec-within-the-transport" class="xref">FEC within the transport</a><a href="#section-toc.1-1.4.1" class="pilcrow">¶</a></p>
-<ul class="ulEmpty compact toc">
-<li class="ulEmpty compact toc" id="section-toc.1-1.4.2.1">
-                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="xref">4.1</a>.  <a href="#name-flowchart-2" class="xref">Flowchart</a><a href="#section-toc.1-1.4.2.1.1" class="pilcrow">¶</a></p>
-</li>
-              <li class="ulEmpty compact toc" id="section-toc.1-1.4.2.2">
-                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="xref">4.2</a>.  <a href="#name-discussion-2" class="xref">Discussion</a><a href="#section-toc.1-1.4.2.2.1" class="pilcrow">¶</a></p>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.2.2.5">
+                <p id="section-toc.1-1.2.2.5.1"><a href="#section-2.5" class="xref">2.5</a>.  <a href="#name-fairness-a-policy-concern" class="xref">Fairness, a policy concern</a></p>
 </li>
             </ul>
 </li>
-          <li class="ulEmpty compact toc" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-fec-below-the-transport" class="xref">FEC below the transport</a><a href="#section-toc.1-1.5.1" class="pilcrow">¶</a></p>
-<ul class="ulEmpty compact toc">
-<li class="ulEmpty compact toc" id="section-toc.1-1.5.2.1">
-                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="xref">5.1</a>.  <a href="#name-flowchart-3" class="xref">Flowchart</a><a href="#section-toc.1-1.5.2.1.1" class="pilcrow">¶</a></p>
+          <li class="ulEmpty toc compact" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="xref">3</a>.  <a href="#name-fec-above-the-transport" class="xref">FEC above the transport</a></p>
+<ul class="ulEmpty toc compact">
+<li class="ulEmpty toc compact" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="xref">3.1</a>.  <a href="#name-fairness-and-impact-on-non-" class="xref">Fairness and impact on non-coded flows</a></p>
 </li>
-              <li class="ulEmpty compact toc" id="section-toc.1-1.5.2.2">
-                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="xref">5.2</a>.  <a href="#name-discussion-3" class="xref">Discussion</a><a href="#section-toc.1-1.5.2.2.1" class="pilcrow">¶</a></p>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="xref">3.2</a>.  <a href="#name-congestion-control-and-reco" class="xref">Congestion control and recovered symbols</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="xref">3.3</a>.  <a href="#name-interactions-between-conges" class="xref">Interactions between congestion control and coding rates</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.3.2.4">
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="xref">3.4</a>.  <a href="#name-on-useless-repair-symbols" class="xref">On useless repair symbols</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.3.2.5">
+                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="xref">3.5</a>.  <a href="#name-on-partial-ordering" class="xref">On partial ordering</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.3.2.6">
+                <p id="section-toc.1-1.3.2.6.1"><a href="#section-3.6" class="xref">3.6</a>.  <a href="#name-on-partial-reliability" class="xref">On partial reliability</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.3.2.7">
+                <p id="section-toc.1-1.3.2.7.1"><a href="#section-3.7" class="xref">3.7</a>.  <a href="#name-on-multipath-transport" class="xref">On multipath transport</a></p>
 </li>
             </ul>
 </li>
-          <li class="ulEmpty compact toc" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>.  <a href="#name-fairness-redundacy-rate-and" class="xref">Fairness, redundacy rate and congestion signals</a><a href="#section-toc.1-1.6.1" class="pilcrow">¶</a></p>
-<ul class="ulEmpty compact toc">
-<li class="ulEmpty compact toc" id="section-toc.1-1.6.2.1">
-                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="xref">6.1</a>.  <a href="#name-fairness-a-policy-concern" class="xref">Fairness, a policy concern</a><a href="#section-toc.1-1.6.2.1.1" class="pilcrow">¶</a></p>
+          <li class="ulEmpty toc compact" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="xref">4</a>.  <a href="#name-fec-within-the-transport" class="xref">FEC within the transport</a></p>
+<ul class="ulEmpty toc compact">
+<li class="ulEmpty toc compact" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="xref">4.1</a>.  <a href="#name-fairness-and-impact-on-non-c" class="xref">Fairness and impact on non-coded flows</a></p>
 </li>
-              <li class="ulEmpty compact toc" id="section-toc.1-1.6.2.2">
-                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="xref">6.2</a>.  <a href="#name-fairness-and-impact-on-non-" class="xref">Fairness and impact on non-coded flows</a><a href="#section-toc.1-1.6.2.2.1" class="pilcrow">¶</a></p>
-<ul class="ulEmpty compact toc">
-<li class="ulEmpty compact toc" id="section-toc.1-1.6.2.2.2.1">
-                    <p id="section-toc.1-1.6.2.2.2.1.1"><a href="#section-6.2.1" class="xref">6.2.1</a>.  <a href="#name-fec-above-the-transport-3" class="xref">FEC above the transport</a><a href="#section-toc.1-1.6.2.2.2.1.1" class="pilcrow">¶</a></p>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="xref">4.2</a>.  <a href="#name-congestion-control-and-recov" class="xref">Congestion control and recovered symbols</a></p>
 </li>
-                  <li class="ulEmpty compact toc" id="section-toc.1-1.6.2.2.2.2">
-                    <p id="section-toc.1-1.6.2.2.2.2.1"><a href="#section-6.2.2" class="xref">6.2.2</a>.  <a href="#name-fec-within-the-transport-2" class="xref">FEC within the transport</a><a href="#section-toc.1-1.6.2.2.2.2.1" class="pilcrow">¶</a></p>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="xref">4.3</a>.  <a href="#name-interactions-between-congest" class="xref">Interactions between congestion control and coding rates</a></p>
 </li>
-                  <li class="ulEmpty compact toc" id="section-toc.1-1.6.2.2.2.3">
-                    <p id="section-toc.1-1.6.2.2.2.3.1"><a href="#section-6.2.3" class="xref">6.2.3</a>.  <a href="#name-fec-below-the-transport-3" class="xref">FEC below the transport</a><a href="#section-toc.1-1.6.2.2.2.3.1" class="pilcrow">¶</a></p>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="xref">4.4</a>.  <a href="#name-on-useless-repair-symbols-2" class="xref">On useless repair symbols</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.4.2.5">
+                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="xref">4.5</a>.  <a href="#name-on-partial-ordering-2" class="xref">On partial ordering</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.4.2.6">
+                <p id="section-toc.1-1.4.2.6.1"><a href="#section-4.6" class="xref">4.6</a>.  <a href="#name-on-partial-reliability-2" class="xref">On partial reliability</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.4.2.7">
+                <p id="section-toc.1-1.4.2.7.1"><a href="#section-4.7" class="xref">4.7</a>.  <a href="#name-on-transport-multipath" class="xref">On transport multipath</a></p>
+</li>
+            </ul>
+</li>
+          <li class="ulEmpty toc compact" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="xref">5</a>.  <a href="#name-fec-below-the-transport" class="xref">FEC below the transport</a></p>
+<ul class="ulEmpty toc compact">
+<li class="ulEmpty toc compact" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="xref">5.1</a>.  <a href="#name-fairness-and-impact-on-non-co" class="xref">Fairness and impact on non-coded flows</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="xref">5.2</a>.  <a href="#name-congestion-control-and-recove" class="xref">Congestion control and recovered symbols</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="xref">5.3</a>.  <a href="#name-interactions-between-congesti" class="xref">Interactions between congestion control and coding rates</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="xref">5.4</a>.  <a href="#name-on-useless-repair-symbols-3" class="xref">On useless repair symbols</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.5.2.5">
+                <p id="section-toc.1-1.5.2.5.1"><a href="#section-5.5" class="xref">5.5</a>.  <a href="#name-on-partial-ordering-3" class="xref">On partial ordering</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.5.2.6">
+                <p id="section-toc.1-1.5.2.6.1"><a href="#section-5.6" class="xref">5.6</a>.  <a href="#name-on-partial-reliability-3" class="xref">On partial reliability</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.5.2.7">
+                <p id="section-toc.1-1.5.2.7.1"><a href="#section-5.7" class="xref">5.7</a>.  <a href="#name-on-transport-multipath-2" class="xref">On transport multipath</a></p>
+</li>
+            </ul>
+</li>
+          <li class="ulEmpty toc compact" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="xref">6</a>.  <a href="#name-research-recommendations-an" class="xref">Research recommendations and questions</a></p>
+<ul class="ulEmpty toc compact">
+<li class="ulEmpty toc compact" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="xref">6.1</a>.  <a href="#name-activities-related-to-conge" class="xref">Activities related to congestion control and coding</a></p>
+</li>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="xref">6.2</a>.  <a href="#name-open-research-questions" class="xref">Open research questions</a></p>
+<ul class="ulEmpty toc compact">
+<li class="ulEmpty toc compact" id="section-toc.1-1.6.2.2.2.1">
+                    <p id="section-toc.1-1.6.2.2.2.1.1"><a href="#section-6.2.1" class="xref">6.2.1</a>.  <a href="#name-parameter-derivation" class="xref">Parameter derivation</a></p>
+</li>
+                  <li class="ulEmpty toc compact" id="section-toc.1-1.6.2.2.2.2">
+                    <p id="section-toc.1-1.6.2.2.2.2.1"><a href="#section-6.2.2" class="xref">6.2.2</a>.  <a href="#name-new-signaling-methods-and-f" class="xref">New signaling methods and fairness</a></p>
 </li>
                 </ul>
 </li>
-              <li class="ulEmpty compact toc" id="section-toc.1-1.6.2.3">
-                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="xref">6.3</a>.  <a href="#name-congestion-control-and-reco" class="xref">Congestion control and recovered symbols</a><a href="#section-toc.1-1.6.2.3.1" class="pilcrow">¶</a></p>
-<ul class="ulEmpty compact toc">
-<li class="ulEmpty compact toc" id="section-toc.1-1.6.2.3.2.1">
-                    <p id="section-toc.1-1.6.2.3.2.1.1"><a href="#section-6.3.1" class="xref">6.3.1</a>.  <a href="#name-fec-above-the-transport-4" class="xref">FEC above the transport</a><a href="#section-toc.1-1.6.2.3.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                  <li class="ulEmpty compact toc" id="section-toc.1-1.6.2.3.2.2">
-                    <p id="section-toc.1-1.6.2.3.2.2.1"><a href="#section-6.3.2" class="xref">6.3.2</a>.  <a href="#name-fec-within-the-transport-3" class="xref">FEC within the transport</a><a href="#section-toc.1-1.6.2.3.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                  <li class="ulEmpty compact toc" id="section-toc.1-1.6.2.3.2.3">
-                    <p id="section-toc.1-1.6.2.3.2.3.1"><a href="#section-6.3.3" class="xref">6.3.3</a>.  <a href="#name-fec-below-the-transport-4" class="xref">FEC below the transport</a><a href="#section-toc.1-1.6.2.3.2.3.1" class="pilcrow">¶</a></p>
-</li>
-                </ul>
-</li>
-              <li class="ulEmpty compact toc" id="section-toc.1-1.6.2.4">
-                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="xref">6.4</a>.  <a href="#name-interactions-between-conges" class="xref">Interactions between congestion control and coding rates</a><a href="#section-toc.1-1.6.2.4.1" class="pilcrow">¶</a></p>
-<ul class="ulEmpty compact toc">
-<li class="ulEmpty compact toc" id="section-toc.1-1.6.2.4.2.1">
-                    <p id="section-toc.1-1.6.2.4.2.1.1"><a href="#section-6.4.1" class="xref">6.4.1</a>.  <a href="#name-fec-above-the-transport-5" class="xref">FEC above the transport</a><a href="#section-toc.1-1.6.2.4.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                  <li class="ulEmpty compact toc" id="section-toc.1-1.6.2.4.2.2">
-                    <p id="section-toc.1-1.6.2.4.2.2.1"><a href="#section-6.4.2" class="xref">6.4.2</a>.  <a href="#name-fec-within-the-transport-4" class="xref">FEC within the transport</a><a href="#section-toc.1-1.6.2.4.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                  <li class="ulEmpty compact toc" id="section-toc.1-1.6.2.4.2.3">
-                    <p id="section-toc.1-1.6.2.4.2.3.1"><a href="#section-6.4.3" class="xref">6.4.3</a>.  <a href="#name-fec-below-the-transport-5" class="xref">FEC below the transport</a><a href="#section-toc.1-1.6.2.4.2.3.1" class="pilcrow">¶</a></p>
-</li>
-                </ul>
-</li>
-              <li class="ulEmpty compact toc" id="section-toc.1-1.6.2.5">
-                <p id="section-toc.1-1.6.2.5.1"><a href="#section-6.5" class="xref">6.5</a>.  <a href="#name-on-the-useless-repair-symbo" class="xref">On the useless repair symbols</a><a href="#section-toc.1-1.6.2.5.1" class="pilcrow">¶</a></p>
-<ul class="ulEmpty compact toc">
-<li class="ulEmpty compact toc" id="section-toc.1-1.6.2.5.2.1">
-                    <p id="section-toc.1-1.6.2.5.2.1.1"><a href="#section-6.5.1" class="xref">6.5.1</a>.  <a href="#name-fec-above-the-transport-6" class="xref">FEC above the transport</a><a href="#section-toc.1-1.6.2.5.2.1.1" class="pilcrow">¶</a></p>
-</li>
-                  <li class="ulEmpty compact toc" id="section-toc.1-1.6.2.5.2.2">
-                    <p id="section-toc.1-1.6.2.5.2.2.1"><a href="#section-6.5.2" class="xref">6.5.2</a>.  <a href="#name-fec-within-the-transport-5" class="xref">FEC within the transport</a><a href="#section-toc.1-1.6.2.5.2.2.1" class="pilcrow">¶</a></p>
-</li>
-                  <li class="ulEmpty compact toc" id="section-toc.1-1.6.2.5.2.3">
-                    <p id="section-toc.1-1.6.2.5.2.3.1"><a href="#section-6.5.3" class="xref">6.5.3</a>.  <a href="#name-fec-below-the-transport-6" class="xref">FEC below the transport</a><a href="#section-toc.1-1.6.2.5.2.3.1" class="pilcrow">¶</a></p>
-</li>
-                </ul>
+              <li class="ulEmpty toc compact" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="xref">6.3</a>.  <a href="#name-recommendations-and-advice-" class="xref">Recommendations and advice for evaluating coding mechanisms</a></p>
 </li>
             </ul>
 </li>
-          <li class="ulEmpty compact toc" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>.  <a href="#name-open-research-questions" class="xref">Open research questions</a><a href="#section-toc.1-1.7.1" class="pilcrow">¶</a></p>
-<ul class="ulEmpty compact toc">
-<li class="ulEmpty compact toc" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="xref">7.1</a>.  <a href="#name-activities-related-to-conge" class="xref">Activities related to congestion control and coding</a><a href="#section-toc.1-1.7.2.1.1" class="pilcrow">¶</a></p>
+          <li class="ulEmpty toc compact" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="xref">7</a>.  <a href="#name-acknowledgements" class="xref">Acknowledgements</a></p>
 </li>
-              <li class="ulEmpty compact toc" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="xref">7.2</a>.  <a href="#name-open-research-questions-2" class="xref">Open research questions</a><a href="#section-toc.1-1.7.2.2.1" class="pilcrow">¶</a></p>
+          <li class="ulEmpty toc compact" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="xref">8</a>.  <a href="#name-iana-considerations" class="xref">IANA Considerations</a></p>
 </li>
-              <li class="ulEmpty compact toc" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="xref">7.3</a>.  <a href="#name-advices-for-evaluating-codi" class="xref">Advices for evaluating coding mechanisms</a><a href="#section-toc.1-1.7.2.3.1" class="pilcrow">¶</a></p>
+          <li class="ulEmpty toc compact" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="xref">9</a>.  <a href="#name-security-considerations" class="xref">Security Considerations</a></p>
 </li>
-            </ul>
+          <li class="ulEmpty toc compact" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="xref">10</a>. <a href="#name-informative-references" class="xref">Informative References</a></p>
 </li>
-          <li class="ulEmpty compact toc" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="xref">8</a>.  <a href="#name-acknowledgements" class="xref">Acknowledgements</a><a href="#section-toc.1-1.8.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="ulEmpty compact toc" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="xref">9</a>.  <a href="#name-iana-considerations" class="xref">IANA Considerations</a><a href="#section-toc.1-1.9.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="ulEmpty compact toc" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="xref">10</a>. <a href="#name-security-considerations" class="xref">Security Considerations</a><a href="#section-toc.1-1.10.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="ulEmpty compact toc" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#section-11" class="xref">11</a>. <a href="#name-informative-references" class="xref">Informative References</a><a href="#section-toc.1-1.11.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="ulEmpty compact toc" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#section-appendix.a" class="xref"></a><a href="#name-authors-addresses" class="xref">Authors' Addresses</a><a href="#section-toc.1-1.12.1" class="pilcrow">¶</a></p>
+          <li class="ulEmpty toc compact" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-appendix.a" class="xref"></a><a href="#name-authors-addresses" class="xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1062,23 +1086,27 @@ address div.right {
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">There are cases where deploying FEC coding improves the performance of a transmission. As an example, it may take time for the sender to detect transfer tail losses (losses that occur at the end of a transfer, where e.g., TCP obtains no more ACKs to repair the loss via retransmission quickly). Allowing the receiver to recover such losses instead of having to rely on a retransmission could improve the experience of applications using short flows. Another example are networks where non-congestion losses are persistent and prevent a sender from exploiting the link capacity.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">Coding is a reliability mechanism that is distinct and separate from the loss detection of congestion controls. <span>[<a href="#RFC5681" class="xref">RFC5681</a>]</span> defines TCP as a loss-based congestion control; since FEC coding repairs such losses, blindly applying it may easily lead to an implementation that also hides a congestion signal from the sender. It is important to ensure that such information hiding does not occur.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">FEC coding and congestion control can be seen as two separate channels. In practice, implementations may mix the signals that are exchanged on these channels. This memo offers a discussion of how FEC coding and congestion control can coexist. Another objective is to encourage the research community also to consider congestion control aspects when proposing and comparing FEC coding solutions in communication systems. This document does not aim at proposing guidelines for characterizing
+<p id="section-1-1">There are cases where deploying FEC coding improves the performance of a transmission. As an example, it may take time for a sender to detect transfer tail losses (losses that occur at the end of a transfer, where, e.g., TCP obtains no more ACKs that would enable it to quickly repair the loss via retransmission). Allowing the receiver to recover such losses instead of having to rely on a retransmission could improve the experience of applications using short flows. Another example is a network where non-congestion losses are persistent and prevent a sender from exploiting the link capacity.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Coding is a reliability mechanism that is distinct and separate from the loss detection of congestion controls. <span>[<a href="#RFC5681" class="xref">RFC5681</a>]</span> defines the loss-based congestion control of TCP; since FEC coding repairs such losses, blindly applying it may easily lead to an implementation that also hides a congestion signal from the sender. It is important to ensure that such information hiding does not occur.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">FEC coding and congestion control can be seen as two separate channels. In practice, implementations may mix the signals that are exchanged on these channels. This memo offers a discussion of how FEC coding and congestion control coexist. Another objective is to encourage the research community also to consider congestion control aspects when proposing and comparing FEC coding solutions in communication systems. This document does not aim at proposing guidelines for characterizing
         FEC coding solutions.<a href="#section-1-3" class="pilcrow">¶</a></p>
-<p id="section-1-4">The proposed document considers an end-to-end unicast data transfer with FEC coding at the application (above the transport), within the transport or directly below the transport. The typical application scenario considered in the current version of the document is a client browsing the web or watching a live video. This memo may be extended to cases with multiple paths.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-4">We consider an end-to-end unicast data transfer with FEC coding in the application (above the transport), within the transport or directly below the transport. A typical scenario for the considerations in this document is a client browsing the web or watching a live video.<a href="#section-1-4" class="pilcrow">¶</a></p>
 <p id="section-1-5">This document represents the collaborative work and consensus of the Coding for Efficient Network Communications Research Group (NWCRG); it is not an IETF product and is not a standard. The document follows the terminology proposed in the taxonomy document <span>[<a href="#RFC8406" class="xref">RFC8406</a>]</span>.<a href="#section-1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec_notations">
 <section id="section-2">
-      <h2 id="name-separate-channels-separate-">
-<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-separate-channels-separate-" class="section-name selfRef">Separate channels, separate entities</a>
+      <h2 id="name-context">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-context" class="section-name selfRef">Context</a>
       </h2>
-<p id="section-2-1"><a href="#fig_sep-channel" class="xref">Figure 1</a> presents the notations that will be used in this document and introduces the Congestion Control (CC) and Forward Erasure Correction (FEC) channels. The Congestion Control channel carries source packets from a sender to a receiver, and packets signaling information about the network (number of packets received vs. lost, ECN marks, etc.) from the receiver to the sender. The Forward Erasure Correction channel carries repair symbols (from the sender to the receiver) and potential information signaling which packets have been repaired (from the receiver to the sender). It is worth pointing out that there are cases where these channels are not separated.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<section id="section-2.1">
+        <h3 id="name-separate-channels-separate-">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-separate-channels-separate-" class="section-name selfRef">Separate channels, separate entities</a>
+        </h3>
+<p id="section-2.1-1"><a href="#fig_sep-channel" class="xref">Figure 1</a> presents the notations that will be used in this document and introduces the Congestion Control (CC) and Forward Erasure Correction (FEC) channels. The Congestion Control channel carries source packets from a sender to a receiver, and packets signaling information about the network (number of packets received vs. lost, Explicit Congestion Notification (ECN) marks, etc.) from the receiver to the sender. The Forward Erasure Correction channel carries repair symbols (from the sender to the receiver) and information from the receiver to the sender (e.g. signaling which packets have been repaired, loss rate prior and/or after decoding, etc.).<a href="#section-2.1-1" class="pilcrow">¶</a></p>
 <span id="name-notations-and-separate-chan"></span><div id="fig_sep-channel">
 <figure id="figure-1">
-        <div class="artwork art-text alignLeft" id="section-2-2.1">
+          <div class="artwork art-text alignLeft" id="section-2.1-2.1">
 <pre>
  SENDER                                RECEIVER
 
@@ -1097,13 +1125,13 @@ address div.right {
 </div>
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
 <a href="#name-notations-and-separate-chan" class="selfRef">Notations and separate channels</a>
-        </figcaption></figure>
+          </figcaption></figure>
 </div>
-<p id="section-2-3">Inside a host, the CC and FEC entities can be regarded as
-            conceptually separate:<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2.1-3">Inside a host, the CC and FEC entities can be regarded as
+            conceptually separate:<a href="#section-2.1-3" class="pilcrow">¶</a></p>
 <span id="name-separate-entities-sender-si"></span><div id="fig_sep-entities-srv">
 <figure id="figure-2">
-        <div class="artwork art-text alignLeft" id="section-2-4.1">
+          <div class="artwork art-text alignLeft" id="section-2.1-4.1">
 <pre>
   |            ^             |             ^
   | source     | coding      |packets      | sending
@@ -1122,11 +1150,11 @@ address div.right {
 </div>
 <figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
 <a href="#name-separate-entities-sender-si" class="selfRef">Separate entities (sender-side)</a>
-        </figcaption></figure>
+          </figcaption></figure>
 </div>
 <span id="name-separate-entities-receiver-"></span><div id="fig_sep-entities-clt">
 <figure id="figure-3">
-        <div class="artwork art-text alignLeft" id="section-2-5.1">
+          <div class="artwork art-text alignLeft" id="section-2.1-5.1">
 <pre>
   |                                 |
   | source and/or                   | packets
@@ -1141,24 +1169,24 @@ address div.right {
 </div>
 <figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
 <a href="#name-separate-entities-receiver-" class="selfRef">Separate entities (receiver-side)</a>
-        </figcaption></figure>
+          </figcaption></figure>
 </div>
-<p id="section-2-6"><a href="#fig_sep-entities-srv" class="xref">Figure 2</a> and <a href="#fig_sep-entities-clt" class="xref">Figure 3</a> provide more details than <a href="#fig_sep-channel" class="xref">Figure 1</a>. Some elements are introduced:<a href="#section-2-6" class="pilcrow">¶</a></p>
+<p id="section-2.1-6"><a href="#fig_sep-entities-srv" class="xref">Figure 2</a> and <a href="#fig_sep-entities-clt" class="xref">Figure 3</a> provide more details than <a href="#fig_sep-channel" class="xref">Figure 1</a>. Some elements are introduced:<a href="#section-2.1-6" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-2-7.1">'network information' (input control plane for the transport including CC): refers not only to the network information that is explicitly signaled from the receiver, but all the information a congestion control obtains from a network (e.g., TCP can estimate the latency and the available capacity at the bottleneck).<a href="#section-2-7.1" class="pilcrow">¶</a>
+<li class="normal" id="section-2.1-7.1">'network information' (input control plane for the transport including CC): refers not only to the network information that is explicitly signaled from the receiver, but all the information a congestion control obtains from a network (e.g., TCP can estimate the latency and the available capacity at the bottleneck).<a href="#section-2.1-7.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-2-7.2">'requirements' (input control plane for the transport including CC): refers to application requirements such as upper/lower rate bounds, periods of quiescence, or a priority.<a href="#section-2-7.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-2.1-7.2">'requirements' (input control plane for the transport including CC): refers to application requirements such as upper/lower rate bounds, periods of quiescence, or a priority.<a href="#section-2.1-7.2" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-2-7.3">'sending rate (or window)' (output control plane for the transport including CC): refers to the rate at which a congestion control decides to transmit packets based on 'network information'.<a href="#section-2-7.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-2.1-7.3">'sending rate (or window)' (output control plane for the transport including CC): refers to the rate at which a congestion control decides to transmit packets based on 'network information'.<a href="#section-2.1-7.3" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-2-7.4">'signaling repaired symbols' (input control plane for the FEC): refers to the information a FEC sender can obtain from a FEC receiver about the performance of the FEC solution as seen by the receiver.<a href="#section-2-7.4" class="pilcrow">¶</a>
+          <li class="normal" id="section-2.1-7.4">'signaling repaired symbols' (input control plane for the FEC): refers to the information a FEC sender can obtain from a FEC receiver about the performance of the FEC solution as seen by the receiver.<a href="#section-2.1-7.4" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-2-7.5">'coding rate' (output control plane for the FEC): refers to the coding rate that is used by the FEC solution.<a href="#section-2-7.5" class="pilcrow">¶</a>
+          <li class="normal" id="section-2.1-7.5">'coding rate' (output control plane for the FEC): refers to the coding rate that is used by the FEC solution (i.e.  proportion of transmitted symbols that carry useful data).<a href="#section-2.1-7.5" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-2-7.6">'source and/or repair symbols' (data plane for both the FEC and the CC): refers to the data that is transmitted. The sender can decide to send source symbols only (meaning that the coding rate is 0), repair symbols only (if the solution decides not to send the original source packets) or a mix of both.<a href="#section-2-7.6" class="pilcrow">¶</a>
+          <li class="normal" id="section-2.1-7.6">'source and/or repair symbols' (data plane for both the FEC and the CC): refers to the data that is transmitted. The sender can decide to send source symbols only (meaning that the coding rate is 0), repair symbols only (if the solution decides not to send the original source packets) or a mix of both.<a href="#section-2.1-7.6" class="pilcrow">¶</a>
 </li>
-      </ul>
-<p id="section-2-8">The inputs to FEC (incoming data packets without repair symbols, and signaling
+        </ul>
+<p id="section-2.1-8">The inputs to FEC (incoming data packets without repair symbols, and signaling
  from the receiver about losses and/or repaired symbols)
         are distinct from the inputs to CC. The latter calculates a
         sending rate or window from network information, and it takes
@@ -1166,14 +1194,86 @@ address div.right {
         such as upper/lower rate bounds, periods of quiescence, or a priority.
         It is not clear that the ACK signals feeding into a congestion control
             algorithm are useful to FEC in their raw form, and vice versa - information
-     about repaired blocks may be quite irrelevant to a CC algorithm.<a href="#section-2-8" class="pilcrow">¶</a></p>
-<p id="section-2-9">The choice of the adequate transport layer may be related to application requirements:<a href="#section-2-9" class="pilcrow">¶</a></p>
+     about repaired blocks may be quite irrelevant to a CC algorithm.<a href="#section-2.1-8" class="pilcrow">¶</a></p>
+</section>
+<section id="section-2.2">
+        <h3 id="name-relation-between-transport-">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-relation-between-transport-" class="section-name selfRef">Relation between transport layer and application requirements</a>
+        </h3>
+<p id="section-2.2-1">The choice of the adequate transport layer may be related to application requirements and the services offered by a transport protocol <span>[<a href="#RFC8095" class="xref">RFC8095</a>]</span>:<a href="#section-2.2-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-2-10.1">In the case of an unreliable data transfer, the transport layer may provide a non-reliable transport service (e.g. UDP or DCCP <span>[<a href="#RFC4340" class="xref">RFC4340</a>]</span> or a partially reliable transport protocol such as SCTP with partial reliability <span>[<a href="#RFC3758" class="xref">RFC3758</a>]</span>). Depending on the amount of redundancy and network conditions, there could be cases where it becomes impossible to carry traffic.<a href="#section-2-10.1" class="pilcrow">¶</a>
+<li class="normal" id="section-2.2-2.1">The transport layer may provide an unreliable transport service (e.g. UDP or DCCP <span>[<a href="#RFC4340" class="xref">RFC4340</a>]</span>) or a partially reliable transport service (e.g. SCTP with the partial reliability extension <span>[<a href="#RFC3758" class="xref">RFC3758</a>]</span> or QUIC with the unreliable datagram extension <span>[<a href="#I-D.ietf-quic-datagram" class="xref">I-D.ietf-quic-datagram</a>]</span>). Depending on the amount of redundancy and network conditions, there could be cases where it becomes impossible to carry traffic.<a href="#section-2.2-2.1" class="pilcrow">¶</a>
 </li>
-        <li class="normal" id="section-2-10.2">In the case of a reliable data transfer, the transport layer may implement a retransmission mechanism to guarantee the reliability of the file transfer (e.g. TCP). Depending on how the FEC and CC functions are scheduled (FEC above CC, FEC in CC, FEC below CC), the impact of reliable transport on the FEC reliability mechanisms is different.<a href="#section-2-10.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-2.2-2.2">The transport layer may implement a retransmission mechanism to guarantee the reliability of a data transfer (e.g. TCP). Depending on how the FEC and CC functions are scheduled (FEC above CC, FEC in CC, FEC below CC), the impact of reliable transport on the FEC reliability mechanisms is different.<a href="#section-2.2-2.2" class="pilcrow">¶</a>
 </li>
-      </ul>
+        </ul>
+</section>
+<section id="section-2.3">
+        <h3 id="name-transport-multipath">
+<a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-transport-multipath" class="section-name selfRef">Transport multipath</a>
+        </h3>
+<p id="section-2.3-1">The application layer may be composed of several streams above FEC and transport layers instances. The different streams could exploit different paths between the sender and the receiver or not. The document considers one application layer stream as input packets above a combination of FEC and transport layers. In <a href="#fig_multi-scope" class="xref">Figure 4</a>, each of stream 1 and stream 2 are considered in the scope of the document but a combination of stream 1 and stream 2 is not. The case of multiple application level streams above multiple FEC and transport layers instances is out of the scope of the document and not further described.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+<span id="name-scope-of-the-transport-mult"></span><div id="fig_multi-scope">
+<figure id="figure-4">
+          <div class="artwork art-text alignLeft" id="section-2.3-2.1">
+<pre>
+  +-----------------------------------------------+
+  |                   Application                 |
+  |                                               |
+  |  +-------------------+ +-------------------+  |
+  |  |      Stream 1     | |      Stream 2     |  |
+  |  +-------------------+ +-------------------+  |
+  |                                               |
+  |  +-------------------+ +-------------------+  |
+  |  |        FEC        | |Multipath Transport|  |
+  |  +-------------------+ +-------------------+  |
+  |                                               |
+  |  +-------------------+ +-----+       +-----+  |
+  |  |Multipath Transport| |Flow1|  ...  |FlowM|  |
+  |  +-------------------+ +-----+       +-----+  |
+  |                                               |
+  |  +-----+       +-----+ +-----+       +-----+  |
+  |  |Flow1|  ...  |FlowM| | FEC |  ...  | FEC |  |
+  |  +-----+       +-----+ +-----+       +-----+  |
+  +-----------------------------------------------+
+</pre>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-scope-of-the-transport-mult" class="selfRef">Scope of the transport multipath</a>
+          </figcaption></figure>
+</div>
+</section>
+<div id="subsec_def_code">
+<section id="section-2.4">
+        <h3 id="name-types-of-coding">
+<a href="#section-2.4" class="section-number selfRef">2.4. </a><a href="#name-types-of-coding" class="section-name selfRef">Types of coding</a>
+        </h3>
+<p id="section-2.4-1"><span>[<a href="#RFC8406" class="xref">RFC8406</a>]</span> summarizes recommended terminology for Network Coding concepts and constructs. In particular, the document identifies the following coding types (among many others):<a href="#section-2.4-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2.4-2.1">Block Coding: Coding technique where the input Flow must first be segmented into a sequence of blocks; FEC encoding and decoding are performed independently on a per-block basis.<a href="#section-2.4-2.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-2.4-2.2">Sliding Window Coding: general class of coding techniques that rely on a sliding encoding window.<a href="#section-2.4-2.2" class="pilcrow">¶</a>
+</li>
+        </ul>
+<p id="section-2.4-3">The decoding scheme may not be able to decode all the symbols. The chance of decoding the erased packets depends on the size of the encoding window, the coding rate and the distribution of erasure in the transmission channel. The FEC channel may let the client transmit information related to the need of supplementary symbols to adapt the level of reliability. Partial and full reliability could be envisioned.<a href="#section-2.4-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2.4-4.1">Full reliability: The receiver may hold symbols until the decoding of source packets is possible. In particular, if the codec does not enable a subset of the linear system to be inverted, the receiver would have to wait for a certain minimum amount of repair packets before it can recover all the source packets.<a href="#section-2.4-4.1" class="pilcrow">¶</a>
+</li>
+          <li class="normal" id="section-2.4-4.2">Partial reliability: The receiver cannot deliver source packets that could not have been decoded to the upper layer. If the size of the encoding window (for Sliding Window Coding) and the size of the blocks (for Block Coding) are large, the chances of recovering the erased symbols would increase. However, this would impact on memory requirements and the cost of encoding and decoding processes.<a href="#section-2.4-4.2" class="pilcrow">¶</a>
+</li>
+        </ul>
+</section>
+</div>
+<div id="subsec_def_fairness">
+<section id="section-2.5">
+        <h3 id="name-fairness-a-policy-concern">
+<a href="#section-2.5" class="section-number selfRef">2.5. </a><a href="#name-fairness-a-policy-concern" class="section-name selfRef">Fairness, a policy concern</a>
+        </h3>
+<p id="section-2.5-1">Traffic from or to different end users may share various types of bottlenecks. When such a shared bottleneck does not implement some form of flow protection, the share of the available capacity between single flows can help assess when one flow starves the other.<a href="#section-2.5-1" class="pilcrow">¶</a></p>
+<p id="section-2.5-2">As one example, for residential accesses, the data rate can be guaranteed for the customer premises equipment, but not necessarily for the end user. The quality of service that guarantees fairness between the different clients can be seen as a policy concern <span>[<a href="#I-D.briscoe-tsvarea-fair" class="xref">I-D.briscoe-tsvarea-fair</a>]</span>.<a href="#section-2.5-2" class="pilcrow">¶</a></p>
+<p id="section-2.5-3">While past efforts have focused on achieving fairness, quantifying and limiting harm caused by new algorithms (or algorithms with coding) is more practical <span>[<a href="#BEYONDJAIN" class="xref">BEYONDJAIN</a>]</span>. This document considers fairness as the impact of the addition of coded flows on non-coded flows when they share the same bottleneck. It is assumed that the non-coded flows respond to congestion signals from the network. This document does not contribute to the definition of fairness at a wider scale.<a href="#section-2.5-3" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="sec_fec-above">
@@ -1181,14 +1281,9 @@ address div.right {
       <h2 id="name-fec-above-the-transport">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-fec-above-the-transport" class="section-name selfRef">FEC above the transport</a>
       </h2>
-<div id="sec_fec-above-fig">
-<section id="section-3.1">
-        <h3 id="name-flowchart">
-<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-flowchart" class="section-name selfRef">Flowchart</a>
-        </h3>
 <span id="name-fec-above-the-transport-2"></span><div id="fig_fec-above">
-<figure id="figure-4">
-          <div class="artwork art-text alignLeft" id="section-3.1-1.1">
+<figure id="figure-5">
+        <div class="artwork art-text alignLeft" id="section-3-1.1">
 <pre>
  | source                               ^ source
  | packets                              | packets
@@ -1214,21 +1309,67 @@ address div.right {
      SENDER                                 RECEIVER
 </pre>
 </div>
-<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
 <a href="#name-fec-above-the-transport-2" class="selfRef">FEC above the transport</a>
-          </figcaption></figure>
+        </figcaption></figure>
 </div>
-<p id="section-3.1-2"><a href="#fig_fec-above" class="xref">Figure 4</a> present an architecture where FEC operates on top of the transport.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
+<p id="section-3-2"><a href="#fig_fec-above" class="xref">Figure 5</a> presents an architecture where FEC operates on top of the transport.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">The advantage of this approach is that the FEC overhead does not contribute to congestion in the network. When congestion control is implemented at the transport layer, the repair symbols are sent following the congestion window or rate determined by the CC mechanism. This can result in improved quality of experience for latency sensitive applications such as VoIP or any not-fully reliable services.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">This approach requires that the transport protocol does not implement a fully reliable data transfer service (e.g., based on lost packet retransmission). QUIC with unreliable datagram extension <span>[<a href="#I-D.ietf-quic-datagram" class="xref">I-D.ietf-quic-datagram</a>]</span> is an example of a protocol for which this is relevant. In cases where QUIC traffic is blocked and a fall-back to TCP is proposed, there is a risk for bad interactions between TCP's full reliability and coding schemes. For reliable transfers, coding usage does not guarantee better performance; instead, it would mainly reduce goodput.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<div id="subsec_fairness_above">
+<section id="section-3.1">
+        <h3 id="name-fairness-and-impact-on-non-">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-fairness-and-impact-on-non-" class="section-name selfRef">Fairness and impact on non-coded flows</a>
+        </h3>
+<p id="section-3.1-1">The addition of coding within the flow does not influence the interaction between coded and non-coded flows. This interaction would mainly depend on the congestion controls associated with each flow.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="sec_fec-above-discu">
+<div id="subsec_cc-recov-interaction_above">
 <section id="section-3.2">
-        <h3 id="name-discussion">
-<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-discussion" class="section-name selfRef">Discussion</a>
+        <h3 id="name-congestion-control-and-reco">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-congestion-control-and-reco" class="section-name selfRef">Congestion control and recovered symbols</a>
         </h3>
-<p id="section-3.2-1">The advantage of this approach is that the FEC overhead does not contribute to congestion in the network. When congestion control is implemented at the transport layer, the repair symbols are sent following the congestion window. This approach can result in improved quality of experience for latency sensitive applications such as VoIP.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
-<p id="section-3.2-2">This approach requires that the transport protocol does not implement a fully reliable data transfer service (e.g., based on lost packet retransmission). UDP is an example of a protocol for which this approach is relevant. For reliable transfers, coding usage does not guarantee better performance and would mainly reduce goodput for large file transfers.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
-<p id="section-3.2-3">This discussion section is extended in <a href="#sec_fairness" class="xref">Section 6</a>.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.2-1">The congestion control mechanism may not be able to differentiate repair symbols from actual source packets. The relevance of adding coding at the application layer is related to the needs of the application. For real-time applications using an unreliable or partially reliable transport, this approach may reduce the number of losses perceived by the application.<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="subsec_cc-nc-interaction_above">
+<section id="section-3.3">
+        <h3 id="name-interactions-between-conges">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-interactions-between-conges" class="section-name selfRef">Interactions between congestion control and coding rates</a>
+        </h3>
+<p id="section-3.3-1">The coding rate applied at the application layer mainly depends on the available rate or congestion window given by the congestion control underneath. The coding rate could be adapted to avoid adding overhead when the minimum required data rate of the application is not provided by the congestion control underneath. When the congestion control allows sending faster than the application needs, adding coding can reduce packet losses and improve the quality of experience (provided that an unreliable or partially reliable transport is used).<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="subsec_cc-useless-interaction_above">
+<section id="section-3.4">
+        <h3 id="name-on-useless-repair-symbols">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-on-useless-repair-symbols" class="section-name selfRef">On useless repair symbols</a>
+        </h3>
+<p id="section-3.4-1">The discussion depends on application needs. The only case where adding useless repair symbols does not obviously result in reduced goodput is when the application rate is limited (e.g., VoIP traffic). In this case, useless repair symbols would only impact the amount of data generated in the network. Extra data in the network can, however, increase the likelihood of increasing delay and/or packet loss, which could provoke a congestion control reaction that would degrade goodput.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="subsec_partial_order_above">
+<section id="section-3.5">
+        <h3 id="name-on-partial-ordering">
+<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-on-partial-ordering" class="section-name selfRef">On partial ordering</a>
+        </h3>
+<p id="section-3.5-1">Irrespective of the transport protocol, a FEC mechanism does not require to implement a reordering mechanism if the application does not need it. However, if the application needs in-order delivery of packets, a reordering mechanism at the receiver is required.<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="subsec_partial_rel_above">
+<section id="section-3.6">
+        <h3 id="name-on-partial-reliability">
+<a href="#section-3.6" class="section-number selfRef">3.6. </a><a href="#name-on-partial-reliability" class="section-name selfRef">On partial reliability</a>
+        </h3>
+<p id="section-3.6-1">The application may require partial reliability. In this case, the coding rate of a FEC mechanism could be adapted based on inputs from the application and the trade-off between latency and packet loss. Partial reliability impacts the type of FEC and type of codec that can be used, such as discussed in <a href="#subsec_def_code" class="xref">Section 2.4</a>.<a href="#section-3.6-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="subsec_multipath_above">
+<section id="section-3.7">
+        <h3 id="name-on-multipath-transport">
+<a href="#section-3.7" class="section-number selfRef">3.7. </a><a href="#name-on-multipath-transport" class="section-name selfRef">On multipath transport</a>
+        </h3>
+<p id="section-3.7-1">Whether the transport protocol exploits multiple paths or not does not have an impact on the FEC mechanism.<a href="#section-3.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1238,14 +1379,9 @@ address div.right {
       <h2 id="name-fec-within-the-transport">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-fec-within-the-transport" class="section-name selfRef">FEC within the transport</a>
       </h2>
-<div id="sec_fec-in-fig">
-<section id="section-4.1">
-        <h3 id="name-flowchart-2">
-<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-flowchart-2" class="section-name selfRef">Flowchart</a>
-        </h3>
 <span id="name-fec-in-the-transport"></span><div id="fig_fec-in">
-<figure id="figure-5">
-          <div class="artwork art-text alignLeft" id="section-4.1-1.1">
+<figure id="figure-6">
+        <div class="artwork art-text alignLeft" id="section-4-1.1">
 <pre>
  | source  | sending                    ^ source
  | packets | rate                       | packets
@@ -1264,21 +1400,67 @@ address div.right {
     SENDER                              RECEIVER
 </pre>
 </div>
-<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
 <a href="#name-fec-in-the-transport" class="selfRef">FEC in the transport</a>
-          </figcaption></figure>
+        </figcaption></figure>
 </div>
-<p id="section-4.1-2"><a href="#fig_fec-in" class="xref">Figure 5</a> presents an architecture where FEC operates within the transport. The repair symbols are sent within what the congestion window allows, such as in <span>[<a href="#CTCP" class="xref">CTCP</a>]</span>.<a href="#section-4.1-2" class="pilcrow">¶</a></p>
+<p id="section-4-2"><a href="#fig_fec-in" class="xref">Figure 6</a> presents an architecture where FEC operates within the transport. The repair symbols are sent within what the congestion window or calculated rate allows, such as in <span>[<a href="#CTCP" class="xref">CTCP</a>]</span>.<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-3">The advantage of this approach is that it allows a joint optimization of CC and FEC. Moreover, the transmission of repair symbols does not add congestion in potentially congested networks but helps repair lost packets (such as tail losses).<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-4">For reliable transfers, including redundancy reduces goodput for long transfers but the amount of repair symbols can be adapted, e.g. depending on the congestion window size. There is a trade-off between 1) the capacity that could have been exploited by application data instead of transmitting source packets, and 2) the benefits derived from transmitting repair symbols (e.g. unlocking the receive buffer if it is limiting). The coding ratio needs to be carefully designed. For small files, sending repair symbols when there is no more data to transmit could help to reduce the transfer time. Sending repair symbols can avoid the silence period between the transmission of the last packet in the send buffer and 1) firing a retransmission of lost packets, or 2) the transmission of new packets.<a href="#section-4-4" class="pilcrow">¶</a></p>
+<div id="subsec_fairness_in">
+<section id="section-4.1">
+        <h3 id="name-fairness-and-impact-on-non-c">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-fairness-and-impact-on-non-c" class="section-name selfRef">Fairness and impact on non-coded flows</a>
+        </h3>
+<p id="section-4.1-1">The addition of coding within the transport may impact the congestion control mechanism and hide congestion losses. Specific interaction between congestion controls and coding schemes can be proposed (see <a href="#subsec_cc-recov-interaction_in" class="xref">Section 4.2</a>, <a href="#subsec_cc-nc-interaction_in" class="xref">Section 4.3</a> and <a href="#subsec_cc-useless-interaction_in" class="xref">Section 4.4</a>). If no specific interaction is introduced, the coding scheme may hide congestion losses from the congestion controller and the description of <a href="#sec_fec-below" class="xref">Section 5</a> may apply.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="sec_fec-in-discu">
+<div id="subsec_cc-recov-interaction_in">
 <section id="section-4.2">
-        <h3 id="name-discussion-2">
-<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-discussion-2" class="section-name selfRef">Discussion</a>
+        <h3 id="name-congestion-control-and-recov">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-congestion-control-and-recov" class="section-name selfRef">Congestion control and recovered symbols</a>
         </h3>
-<p id="section-4.2-1">The advantage of this approach allows a joint optimization between the CC and the FEC. Moreover, the transmission of repair symbols does not add congestion in potentially congested networks but helps repair lost packets (such as tail losses).<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.2-2">For reliable transfers, including redundancy reduces goodput for large file transfers but the amount of repair symbols can be adapted, e.g. depending on the congestion window size. There is a trade-off between the cost in capacity used to transmit source packets and the benefits brought out by transmitting repair symbols (e.g. unlocking the receive buffer if this is limiting). The coding ratio needs to be carefully designed. For small files, sending repair symbols when there is no more data to transmit could help to reduce the transfer time. In general, sending repair symbols could avoid a silent period between the transmission of the last packet in the send buffer and 1) firing the retransmission of lost packets, or 2) the transmission of new packets.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
-<p id="section-4.2-3">This discussion section is extended in <a href="#sec_fairness" class="xref">Section 6</a>.<a href="#section-4.2-3" class="pilcrow">¶</a></p>
+<p id="section-4.2-1">The receiver can differentiate between source packets and repair symbols. The receiver may indicate both the number of source packets received and repair symbols that were actually useful in the recovery process of packets.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="subsec_cc-nc-interaction_in">
+<section id="section-4.3">
+        <h3 id="name-interactions-between-congest">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-interactions-between-congest" class="section-name selfRef">Interactions between congestion control and coding rates</a>
+        </h3>
+<p id="section-4.3-1">There is an important flexibility in the trade-off, inherent to the use of coding, between (1) reducing goodput when useless repair symbols are transmitted and (2) helping to recover from losses earlier than with retransmissions. The receiver may indicate to the sender the number of packets that have been received or recovered. The sender may use this information to tune the coding ratio. For example, coupling an increased transmission rate with an increasing or decreasing coding rate could be envisioned. A server may use a decreasing coding rate as a probe of the channel capacity and adapt the congestion control transmission rate.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="subsec_cc-useless-interaction_in">
+<section id="section-4.4">
+        <h3 id="name-on-useless-repair-symbols-2">
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-on-useless-repair-symbols-2" class="section-name selfRef">On useless repair symbols</a>
+        </h3>
+<p id="section-4.4-1">The sender may exploit the information given by the receiver to reduce the number of useless repair symbols and the resulting goodput reduction.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="subsec_partial_order_in">
+<section id="section-4.5">
+        <h3 id="name-on-partial-ordering-2">
+<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-on-partial-ordering-2" class="section-name selfRef">On partial ordering</a>
+        </h3>
+<p id="section-4.5-1">The application may require in-order delivery of packets. In this case, both FEC and transport layer mechanisms should guarantee that packets are delivered in order. If partial ordering is requested by the application, both the FEC and transport could relax the constraints related to in-order delivery: reordering mechanisms at the receiver may not be necessary.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="subsec_partial_rel_in">
+<section id="section-4.6">
+        <h3 id="name-on-partial-reliability-2">
+<a href="#section-4.6" class="section-number selfRef">4.6. </a><a href="#name-on-partial-reliability-2" class="section-name selfRef">On partial reliability</a>
+        </h3>
+<p id="section-4.6-1">The application may require partial reliability. In this case, the transport and FEC mechanisms could be conjointly designed. As one example, the reliability offered by FEC may be sufficient, with no retransmission required. This depends on application needs and the trade-off between latency and loss. Partial reliability impacts the type of FEC and type of codec that can be used, such as discussed in <a href="#subsec_def_code" class="xref">Section 2.4</a>.<a href="#section-4.6-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="subsec_multipath_in">
+<section id="section-4.7">
+        <h3 id="name-on-transport-multipath">
+<a href="#section-4.7" class="section-number selfRef">4.7. </a><a href="#name-on-transport-multipath" class="section-name selfRef">On transport multipath</a>
+        </h3>
+<p id="section-4.7-1">The sender may adapt the coding rate of each of the single subpaths, whether the congestion control is coupled or not. There is an important flexibility on how the coding rate is tuned depending on the characteristics of each subpath.<a href="#section-4.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1288,14 +1470,9 @@ address div.right {
       <h2 id="name-fec-below-the-transport">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-fec-below-the-transport" class="section-name selfRef">FEC below the transport</a>
       </h2>
-<div id="sec_fec-below-fig">
-<section id="section-5.1">
-        <h3 id="name-flowchart-3">
-<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-flowchart-3" class="section-name selfRef">Flowchart</a>
-        </h3>
 <span id="name-fec-below-the-transport-2"></span><div id="fig_fec-below">
-<figure id="figure-6">
-          <div class="artwork art-text alignLeft" id="section-5.1-1.1">
+<figure id="figure-7">
+        <div class="artwork art-text alignLeft" id="section-5-1.1">
 <pre>
  | source  | sending rate               ^ source
  | packets | (or window)                | packets
@@ -1318,229 +1495,164 @@ address div.right {
      SENDER                                 RECEIVER
 </pre>
 </div>
-<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
+<figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
 <a href="#name-fec-below-the-transport-2" class="selfRef">FEC below the transport</a>
-          </figcaption></figure>
+        </figcaption></figure>
 </div>
-<p id="section-5.1-2"><a href="#fig_fec-below" class="xref">Figure 6</a> presents an architecture where FEC is applied end-to-end below the transport layer, but above the link layer. Note that it is common to apply FEC at the link layer, in which it contributes to the total capacity that a link exposes to upper layers. This application of FEC is out of scope of this document. In the scenario considered here, the repair symbols are sent on top of what is allowed by the congestion control.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
+<p id="section-5-2"><a href="#fig_fec-below" class="xref">Figure 7</a> presents an architecture where FEC is applied end-to-end below the transport layer, but above the link layer. Note that it is common to apply FEC at the link layer, where it contributes to the total capacity that a link exposes to upper layers. This application of FEC is out of scope of this document. This includes the use of FEC on top of a link layer in scenarios where the link is known by configuration. In the scenario considered here, the repair symbols are sent on top of what is allowed by the congestion control.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-3">Including redundancy adds traffic without reducing goodput but incurs potential fairness issues. The effective bit-rate is higher than the CC's computed fair share due to the transmission of repair symbols, and losses are hidden from the transport. This may cause a problem for loss-based congestion detection, but it is not a problem for delay-based congestion detection.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4">The advantage of this approach is that it can result in performance gains when there are persistent transmission losses along the path.<a href="#section-5-4" class="pilcrow">¶</a></p>
+<p id="section-5-5">The drawback of this approach is that it can induce congestion in already congested networks. The coding ratio needs to be carefully designed.<a href="#section-5-5" class="pilcrow">¶</a></p>
+<p id="section-5-6">Examples of the solution could be to add a given percentage of the congestion window or rate as supplementary symbols, or to send a fixed amount of repair symbols at a fixed rate. The redundancy flow can be decorrelated from the congestion control that manages source packets: a separate congestion control entity could be introduced to manage the amount of repaired packets to transmit on the FEC channel. The separate congestion control instances could be made to work together while adhering to priorities, as in coupled congestion control for RTP media <span>[<a href="#RFC8699" class="xref">RFC8699</a>]</span> in case all traffic can be assumed to take the same path, or otherwise with a multipath congestion window coupling mechanism as in Multipath TCP <span>[<a href="#RFC6356" class="xref">RFC6356</a>]</span>. Another possibility would be to exploit a lower than best-effort congestion control <span>[<a href="#RFC6297" class="xref">RFC6297</a>]</span> for repair symbols.<a href="#section-5-6" class="pilcrow">¶</a></p>
+<div id="subsec_fairness_below">
+<section id="section-5.1">
+        <h3 id="name-fairness-and-impact-on-non-co">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-fairness-and-impact-on-non-co" class="section-name selfRef">Fairness and impact on non-coded flows</a>
+        </h3>
+<p id="section-5.1-1">The coding scheme may hide congestion losses from the congestion controller. There are cases where this can drastically reduce the goodput of non-coded flows. Depending on the congestion control, it may be possible to signal to the congestion control mechanism that there was congestion (loss) even when a packet has been recovered, e.g. using ECN, to reduce the impact on the non-coded flows (see <a href="#subsec_cc-recov-interaction_below" class="xref">Section 5.2</a> and <span>[<a href="#TENTET" class="xref">TENTET</a>]</span>).<a href="#section-5.1-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="sec_fec-below-discu">
+<div id="subsec_cc-recov-interaction_below">
 <section id="section-5.2">
-        <h3 id="name-discussion-3">
-<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-discussion-3" class="section-name selfRef">Discussion</a>
+        <h3 id="name-congestion-control-and-recove">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-congestion-control-and-recove" class="section-name selfRef">Congestion control and recovered symbols</a>
         </h3>
-<p id="section-5.2-1">In this case, including redundancy adds congestion without reducing goodput but leads to potential fairness issues. The effective bitrate is indeed higher than the CC's computed fair share due to the sending of repair symbols and the losses are hidden from the transport. This may cause a problem for loss-based congestion detection, but it is not a problem for delay-based congestion detection.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<p id="section-5.2-2">The advantage of this approach is that it can result in performance gains when there are persistent transmission losses along the path.<a href="#section-5.2-2" class="pilcrow">¶</a></p>
-<p id="section-5.2-3">The drawback of this approach is that it can induce congestion in already congested networks. The coding ratio needs to be carefully designed.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
-<p id="section-5.2-4">Examples of the solution could be adding a given percentage of the congestion window as supplementary symbols or sending a given amount of repair symbols at a given rate. The redundancy flow can be decorrelated from the congestion control that manages source packets: a separate congestion control entity could be introduced to manage the amount of repaired packets to transmit on the FEC channel. The separate congestion control instances could be made to work together while adhering to priorities, as in coupled congestion control for RTP media <span>[<a href="#RFC8699" class="xref">RFC8699</a>]</span> in case all traffic can be assumed to take the same path, or otherwise with a multipath congestion window coupling mechanism as in Multipath TCP <span>[<a href="#RFC6356" class="xref">RFC6356</a>]</span>. Another possibility would be to exploit a lower than best-effort congestion control <span>[<a href="#RFC6297" class="xref">RFC6297</a>]</span> for repair symbols.<a href="#section-5.2-4" class="pilcrow">¶</a></p>
-<p id="section-5.2-5">This discussion section is extended in <a href="#sec_fairness" class="xref">Section 6</a>.<a href="#section-5.2-5" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">The congestion control may not be aware of the existence of a coding scheme underneath it. The congestion control may behave as if no coding scheme had been introduced. The only way for a coding channel to indicate that symbols have been lost but recovered is to exploit existing signaling that is understood by the congestion control mechanism. An example would be to indicate to a TCP sender that a packet has been received, yet congestion has occurred, by using ECN signaling <span>[<a href="#TENTET" class="xref">TENTET</a>]</span>.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-</section>
-</div>
-<div id="sec_fairness">
-<section id="section-6">
-      <h2 id="name-fairness-redundacy-rate-and">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-fairness-redundacy-rate-and" class="section-name selfRef">Fairness, redundacy rate and congestion signals</a>
-      </h2>
-<p id="section-6-1">The objective of this section is to further detail some aspects that have been expressed in previous discussion subsections.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<div id="subsec_def_fairness">
-<section id="section-6.1">
-        <h3 id="name-fairness-a-policy-concern">
-<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-fairness-a-policy-concern" class="section-name selfRef">Fairness, a policy concern</a>
+<div id="subsec_cc-nc-interaction_below">
+<section id="section-5.3">
+        <h3 id="name-interactions-between-congesti">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-interactions-between-congesti" class="section-name selfRef">Interactions between congestion control and coding rates</a>
         </h3>
-<p id="section-6.1-1">The contract between the client and the operator may guarantee a minimum data-rate (e.g. mobile networks). However, for residential accesses, the data-rate can be guaranteed for the customer premises equipment, but not necessarily for the client. The quality of service that guarantees fairness between the different clients can be seen as a policy concern <span>[<a href="#I-D.briscoe-tsvarea-fair" class="xref">I-D.briscoe-tsvarea-fair</a>]</span>.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.1-2">While flow level fairness does not embody the actual application level fairness, the share of available capacity between single flows can help assess when one flow starves the other. Clients may share a bottleneck that may not be ruled by a quality of service mechanism, e.g. in case of:<a href="#section-6.1-2" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-6.1-3.1">a mobile network client running several applications;<a href="#section-6.1-3.1" class="pilcrow">¶</a>
-</li>
-          <li class="normal" id="section-6.1-3.2">two clients on a residential access.<a href="#section-6.1-3.2" class="pilcrow">¶</a>
-</li>
-        </ul>
-<p id="section-6.1-4">This document considers fairness as an index to quantify the impact of the addition of coded flows on non-coded flows when they share the same bottleneck. This document does not aim at contributing to the definition of fairness at a wider scale. This document assumes that the non-coded flows respond to congestion signals from the network.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
+<p id="section-5.3-1">The coding rate can be tuned depending on the number of recovered symbols and the rate at which the sender transmits data. If the coding scheme is not aware of the congestion control implementation, it is hard for the coding scheme to apply the relevant coding rate.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="subsec_fairness">
-<section id="section-6.2">
-        <h3 id="name-fairness-and-impact-on-non-">
-<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-fairness-and-impact-on-non-" class="section-name selfRef">Fairness and impact on non-coded flows</a>
+<div id="subsec_cc-useless-interaction_below">
+<section id="section-5.4">
+        <h3 id="name-on-useless-repair-symbols-3">
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-on-useless-repair-symbols-3" class="section-name selfRef">On useless repair symbols</a>
         </h3>
-<section id="section-6.2.1">
-          <h4 id="name-fec-above-the-transport-3">
-<a href="#section-6.2.1" class="section-number selfRef">6.2.1. </a><a href="#name-fec-above-the-transport-3" class="section-name selfRef">FEC above the transport</a>
-          </h4>
-<p id="section-6.2.1-1">The addition of coding within the flow does not impact on the interaction between coded and non-coded flows. This interaction would mainly depend on the congestion controls embedded in each host.<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
-</section>
-<section id="section-6.2.2">
-          <h4 id="name-fec-within-the-transport-2">
-<a href="#section-6.2.2" class="section-number selfRef">6.2.2. </a><a href="#name-fec-within-the-transport-2" class="section-name selfRef">FEC within the transport</a>
-          </h4>
-<p id="section-6.2.2-1">The addition of coding within the flow may impact the congestion control mechanism and hide congestion losses. Specific interaction between congestion controls and coding schemes can be proposed (see <a href="#subsec_cc-recov-interaction" class="xref">Section 6.3</a>, <a href="#subsec_cc-nc-interaction" class="xref">Section 6.4</a> and <a href="#subsec_cc-useless-interaction" class="xref">Section 6.5</a>). If no specific interaction is introduced, the coding scheme may hide congestion losses from the congestion controller and the description of <a href="#subsub_fec_below" class="xref">Section 6.2.3</a> may apply.<a href="#section-6.2.2-1" class="pilcrow">¶</a></p>
-</section>
-<div id="subsub_fec_below">
-<section id="section-6.2.3">
-          <h4 id="name-fec-below-the-transport-3">
-<a href="#section-6.2.3" class="section-number selfRef">6.2.3. </a><a href="#name-fec-below-the-transport-3" class="section-name selfRef">FEC below the transport</a>
-          </h4>
-<p id="section-6.2.3-1">In this case, the coding scheme may hide congestion losses from the congestion controller. There are cases where this can drastically reduce the goodput of non-coded flows. Depending on the congestion control, it may be possible to signal to the congestion control mechanism that there was congestion (loss) even when a packet has been recovered, e.g. using ECN, to reduce the impact on the non-coded flows (see <a href="#subsec_cc-recov-inter-below" class="xref">Section 6.3.3</a> and <span>[<a href="#TENTET" class="xref">TENTET</a>]</span>).<a href="#section-6.2.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.4-1">Useless repair symbols only impact the load on the network without actual gain for the coded flow. Using feedback signaling, FEC mechanisms can measure the ratio between actually used and useless symbols, and adjust the coding rate.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-</section>
-</div>
-<div id="subsec_cc-recov-interaction">
-<section id="section-6.3">
-        <h3 id="name-congestion-control-and-reco">
-<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-congestion-control-and-reco" class="section-name selfRef">Congestion control and recovered symbols</a>
+<div id="subsec_partial_order_below">
+<section id="section-5.5">
+        <h3 id="name-on-partial-ordering-3">
+<a href="#section-5.5" class="section-number selfRef">5.5. </a><a href="#name-on-partial-ordering-3" class="section-name selfRef">On partial ordering</a>
         </h3>
-<p id="section-6.3-1">The objective of this subsection is to describe potential interactions between the congestion control and the recovered symbols.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
-<section id="section-6.3.1">
-          <h4 id="name-fec-above-the-transport-4">
-<a href="#section-6.3.1" class="section-number selfRef">6.3.1. </a><a href="#name-fec-above-the-transport-4" class="section-name selfRef">FEC above the transport</a>
-          </h4>
-<p id="section-6.3.1-1">The congestion control may not be able to differentiate repair symbols from actual source packets. The relevance of adding coding at the application layer is related to the needs of the application. For real-time applications, this approach may reduce the number of retransmission. The usage of a non-reliable transport is more adequate in this case.<a href="#section-6.3.1-1" class="pilcrow">¶</a></p>
-</section>
-<div id="subsec_cc-recov-inter-in">
-<section id="section-6.3.2">
-          <h4 id="name-fec-within-the-transport-3">
-<a href="#section-6.3.2" class="section-number selfRef">6.3.2. </a><a href="#name-fec-within-the-transport-3" class="section-name selfRef">FEC within the transport</a>
-          </h4>
-<p id="section-6.3.2-1">If the two FEC and CC channels are decoupled, the endpoint may exploit different protocols for each channel. The channels may be coupled and one single protocol may be exploited. In both cases, the receiver can differentiate source packets and repair symbols. The receiver may indicate both the number of source packets received and repair symbols that were actually useful in the recovery process of packets.<a href="#section-6.3.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.5-1">The transport above the FEC channel may support out-of-order delivery of packets: reordering mechanisms at the receiver may not be necessary. In cases where the transport requires in-order delivery, the FEC channel may need to implement a reordering mechanism. Otherwise, spurious retransmissions may occur at the transport level.<a href="#section-5.5-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="subsec_cc-recov-inter-below">
-<section id="section-6.3.3">
-          <h4 id="name-fec-below-the-transport-4">
-<a href="#section-6.3.3" class="section-number selfRef">6.3.3. </a><a href="#name-fec-below-the-transport-4" class="section-name selfRef">FEC below the transport</a>
-          </h4>
-<p id="section-6.3.3-1">The congestion control may not know what is going on in the network underneath and whether a coding scheme is introduced or not. The congestion control may behave as if no coding scheme is introduced. The only way for a coding channel to indicate that symbols have been recovered is to exploit existing signaling that is understood by the congestion control mechanism. An example would be to indicate to a TCP sender that a packet has been recovered (i.e., congestion has occurred), by using ECN signaling <span>[<a href="#TENTET" class="xref">TENTET</a>]</span>.<a href="#section-6.3.3-1" class="pilcrow">¶</a></p>
-</section>
-</div>
-</section>
-</div>
-<div id="subsec_cc-nc-interaction">
-<section id="section-6.4">
-        <h3 id="name-interactions-between-conges">
-<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-interactions-between-conges" class="section-name selfRef">Interactions between congestion control and coding rates</a>
+<div id="subsec_partial_rel_below">
+<section id="section-5.6">
+        <h3 id="name-on-partial-reliability-3">
+<a href="#section-5.6" class="section-number selfRef">5.6. </a><a href="#name-on-partial-reliability-3" class="section-name selfRef">On partial reliability</a>
         </h3>
-<p id="section-6.4-1">This section discusses to what extent the interaction between the congestion control and the coding rates is possible.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
-<section id="section-6.4.1">
-          <h4 id="name-fec-above-the-transport-5">
-<a href="#section-6.4.1" class="section-number selfRef">6.4.1. </a><a href="#name-fec-above-the-transport-5" class="section-name selfRef">FEC above the transport</a>
-          </h4>
-<p id="section-6.4.1-1">The coding rate applied at the application layer mainly depends on the available capacity given by the congestion control underneath. Adapting the coding rate to the minimum required data rate of the application may reduce packet losses and improve the quality of experience.<a href="#section-6.4.1-1" class="pilcrow">¶</a></p>
-</section>
-<section id="section-6.4.2">
-          <h4 id="name-fec-within-the-transport-4">
-<a href="#section-6.4.2" class="section-number selfRef">6.4.2. </a><a href="#name-fec-within-the-transport-4" class="section-name selfRef">FEC within the transport</a>
-          </h4>
-<p id="section-6.4.2-1">In this case, there is an important flexibility in the trade-off, inherent to the use of coding, between (1) reducing goodput when useless repair symbols are transmitted and (2) helping to recover sooner from transmission and congestion losses. As explained in <a href="#subsec_cc-recov-inter-in" class="xref">Section 6.3.2</a>, the receiver may indicate to the sender the number of packets that have been received or recovered. The sender may exploit this information to tune the coding ratio. As one example of flexibility of this case, coupling an increased transmission rate with an increasing or decreasing coding rate could be envisioned. A server may use an increasing coding rate as a probe of the channel capacity and adapt the congestion control transmission rate.<a href="#section-6.4.2-1" class="pilcrow">¶</a></p>
-</section>
-<section id="section-6.4.3">
-          <h4 id="name-fec-below-the-transport-5">
-<a href="#section-6.4.3" class="section-number selfRef">6.4.3. </a><a href="#name-fec-below-the-transport-5" class="section-name selfRef">FEC below the transport</a>
-          </h4>
-<p id="section-6.4.3-1">In this case, the coding rate can be tuned depending on the number of recovered symbols and the rate at which the sender transmits data. The coding scheme is not aware of the congestion control implementation, making it hard for the coding scheme to apply the relevant coding rate.<a href="#section-6.4.3-1" class="pilcrow">¶</a></p>
-</section>
+<p id="section-5.6-1">The transport or application layer above the FEC channel may require partial reliability only. In this case, FEC may provide an unnecessary service if it is not aware of the reliability requirements. Partial reliability impacts the type of FEC and type of codec that can be used, such as discussed in <a href="#subsec_def_code" class="xref">Section 2.4</a>.<a href="#section-5.6-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="subsec_cc-useless-interaction">
-<section id="section-6.5">
-        <h3 id="name-on-the-useless-repair-symbo">
-<a href="#section-6.5" class="section-number selfRef">6.5. </a><a href="#name-on-the-useless-repair-symbo" class="section-name selfRef">On the useless repair symbols</a>
+<div id="subsec_multipath_below">
+<section id="section-5.7">
+        <h3 id="name-on-transport-multipath-2">
+<a href="#section-5.7" class="section-number selfRef">5.7. </a><a href="#name-on-transport-multipath-2" class="section-name selfRef">On transport multipath</a>
         </h3>
-<p id="section-6.5-1">There are cases where useless repair symbols may be transmitted. These impact on the network load and may reduce the goodput of the flow without concrete gains.<a href="#section-6.5-1" class="pilcrow">¶</a></p>
-<section id="section-6.5.1">
-          <h4 id="name-fec-above-the-transport-6">
-<a href="#section-6.5.1" class="section-number selfRef">6.5.1. </a><a href="#name-fec-above-the-transport-6" class="section-name selfRef">FEC above the transport</a>
-          </h4>
-<p id="section-6.5.1-1">In this case, the discussion depends on application needs. The only case where adding useless repair symbols does not result in reduced goodput is when the application needs a limited amount of goodput (e.g., VoIP traffic). In this case, the useless repair symbols would only impact the amount of data generated in the network.<a href="#section-6.5.1-1" class="pilcrow">¶</a></p>
-</section>
-<section id="section-6.5.2">
-          <h4 id="name-fec-within-the-transport-5">
-<a href="#section-6.5.2" class="section-number selfRef">6.5.2. </a><a href="#name-fec-within-the-transport-5" class="section-name selfRef">FEC within the transport</a>
-          </h4>
-<p id="section-6.5.2-1">The sender may exploit the information given by the receiver to reduce the number of useless repair symbols and the resulting goodput reduction.<a href="#section-6.5.2-1" class="pilcrow">¶</a></p>
-</section>
-<section id="section-6.5.3">
-          <h4 id="name-fec-below-the-transport-6">
-<a href="#section-6.5.3" class="section-number selfRef">6.5.3. </a><a href="#name-fec-below-the-transport-6" class="section-name selfRef">FEC below the transport</a>
-          </h4>
-<p id="section-6.5.3-1">In this case, the useless repair symbols only impact the load of the network without actual gain for the coded flow.<a href="#section-6.5.3-1" class="pilcrow">¶</a></p>
-</section>
+<p id="section-5.7-1">The transport may exploit multiple paths without the FEC channel being aware of it. This depends on whether FEC is applied to all subflows or each of the subflows individually. When FEC is applied to all the flows, there is a risk for the coding rate to be inadequate for the characteristics of the individual paths.<a href="#section-5.7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="sec_research">
-<section id="section-7">
-      <h2 id="name-open-research-questions">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-open-research-questions" class="section-name selfRef">Open research questions</a>
+<section id="section-6">
+      <h2 id="name-research-recommendations-an">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-research-recommendations-an" class="section-name selfRef">Research recommendations and questions</a>
       </h2>
-<p id="section-7-1">This section provides a simplified state-of-the art of the activities related to congestion control and coding. The objective is to identify open research questions and contribute to advice when evaluating coding mechanisms.<a href="#section-7-1" class="pilcrow">¶</a></p>
-<section id="section-7.1">
+<p id="section-6-1">This section provides a short state-of-the art overview of activities related to congestion control and coding. The objective is to identify open research questions and contribute to advice when evaluating coding mechanisms.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<section id="section-6.1">
         <h3 id="name-activities-related-to-conge">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-activities-related-to-conge" class="section-name selfRef">Activities related to congestion control and coding</a>
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-activities-related-to-conge" class="section-name selfRef">Activities related to congestion control and coding</a>
         </h3>
-<p id="section-7.1-1">We map activities related to congestion control and coding with the organization presented in this document:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-1">We map activities related to congestion control and coding with the organization presented in this document:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7.1-2.1">For the FEC above transport case: TBD<a href="#section-7.1-2.1" class="pilcrow">¶</a>
+<li class="normal" id="section-6.1-2.1">For the FEC above transport case: <span>[<a href="#RFC8680" class="xref">RFC8680</a>]</span>.<a href="#section-6.1-2.1" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.1-2.2">For the FEC within transport case: <span>[<a href="#I-D.swett-nwcrg-coding-for-quic" class="xref">I-D.swett-nwcrg-coding-for-quic</a>]</span>, <span>[<a href="#QUIC-FEC" class="xref">QUIC-FEC</a>]</span>, <span>[<a href="#RFC5109" class="xref">RFC5109</a>]</span>.<a href="#section-7.1-2.2" class="pilcrow">¶</a>
+          <li class="normal" id="section-6.1-2.2">For the FEC within transport case: <span>[<a href="#I-D.swett-nwcrg-coding-for-quic" class="xref">I-D.swett-nwcrg-coding-for-quic</a>]</span>, <span>[<a href="#QUIC-FEC" class="xref">QUIC-FEC</a>]</span>, <span>[<a href="#RFC5109" class="xref">RFC5109</a>]</span>.<a href="#section-6.1-2.2" class="pilcrow">¶</a>
 </li>
-          <li class="normal" id="section-7.1-2.3">For the FEC below transport case: <span>[<a href="#NCTCP" class="xref">NCTCP</a>]</span>, <span>[<a href="#I-D.detchart-nwcrg-tetrys" class="xref">I-D.detchart-nwcrg-tetrys</a>]</span>.<a href="#section-7.1-2.3" class="pilcrow">¶</a>
+          <li class="normal" id="section-6.1-2.3">For the FEC below transport case: <span>[<a href="#NCTCP" class="xref">NCTCP</a>]</span>, <span>[<a href="#I-D.detchart-nwcrg-tetrys" class="xref">I-D.detchart-nwcrg-tetrys</a>]</span>.<a href="#section-6.1-2.3" class="pilcrow">¶</a>
 </li>
         </ul>
 </section>
-<section id="section-7.2">
-        <h3 id="name-open-research-questions-2">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-open-research-questions-2" class="section-name selfRef">Open research questions</a>
+<section id="section-6.2">
+        <h3 id="name-open-research-questions">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-open-research-questions" class="section-name selfRef">Open research questions</a>
         </h3>
-<p id="section-7.2-1">The research questions should be mapped following the organization of this document. In all these three use-cases, open questions remain. There is a general trade-off, inherent to the use of coding, between (1) reducing goodput when useless repair symbols are transmitted and (2) helping to recover from transmission and congestion losses.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<p id="section-7.2-2">For the FEC above transport case, there is a trade-off related to the amount of redundancy to add, as a function of the transport layer protocol and application requirements.<a href="#section-7.2-2" class="pilcrow">¶</a></p>
-<p id="section-7.2-3">For the FEC within transport case, recovering lost symbols may hide congestion losses to the congestion control. Some existing solutions already propose to disambiguate acked packets from rebuilt packets <span>[<a href="#QUIC-FEC" class="xref">QUIC-FEC</a>]</span>. New signalling methods and FEC-recovery-aware congestion controls could be proposed.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
-<p id="section-7.2-4">For the FEC below transport case, there are opportunities for introducing interaction between congestion control and coding schemes to improve the quality of experience while guaranteeing fairness with other flows. An open question also resides in the relevance of FEC when there are multiple streams that exploit the FEC channel.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.2-1">There is a general trade-off, inherent to the use of coding, between (1) reducing goodput when useless repair symbols are transmitted and (2) helping to recover from transmission and congestion losses.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<section id="section-6.2.1">
+          <h4 id="name-parameter-derivation">
+<a href="#section-6.2.1" class="section-number selfRef">6.2.1. </a><a href="#name-parameter-derivation" class="section-name selfRef">Parameter derivation</a>
+          </h4>
+<p id="section-6.2.1-1">There is a trade-off related to the amount of redundancy to add, as a function of the transport layer protocol and application requirements.<a href="#section-6.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.2.1-2"><span>[<a href="#RFC8095" class="xref">RFC8095</a>]</span> describes the mechanisms provided by existing IETF protocols such as TCP, SCTP or RTP. <span>[<a href="#RFC8406" class="xref">RFC8406</a>]</span> describes the variety of coding techniques. The important level of combinations makes the determination of an optimum parameters derivation very complex. This depends on application requirements and deployment context.<a href="#section-6.2.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.2.1-3">Appendix C of <span>[<a href="#RFC8681" class="xref">RFC8681</a>]</span> describes how to tune the parameters for target use-case. However, this discussion does not integrate congestion-controlled end points.<a href="#section-6.2.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.2.1-4">Research question 1 : "Is there a way to dynamically adjust the codec characteristics depending on the transmission channel, the transport protocol and application requirements ?"<a href="#section-6.2.1-4" class="pilcrow">¶</a></p>
+<p id="section-6.2.1-5">Research question 2 : "Should we apply specific per-stream FEC mechanisms when multiple streams with different reliability needs are carried out ?"<a href="#section-6.2.1-5" class="pilcrow">¶</a></p>
 </section>
-<section id="section-7.3">
-        <h3 id="name-advices-for-evaluating-codi">
-<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-advices-for-evaluating-codi" class="section-name selfRef">Advices for evaluating coding mechanisms</a>
+<section id="section-6.2.2">
+          <h4 id="name-new-signaling-methods-and-f">
+<a href="#section-6.2.2" class="section-number selfRef">6.2.2. </a><a href="#name-new-signaling-methods-and-f" class="section-name selfRef">New signaling methods and fairness</a>
+          </h4>
+<p id="section-6.2.2-1">Recovering lost symbols may hide congestion losses from the congestion control. Disambiguate acked packets from rebuilt packets would help the sender adapt its sending rate accordingly. There are opportunities for introducing interaction between congestion control and coding schemes to improve the quality of experience while guaranteeing fairness with other flows.<a href="#section-6.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-2">Some existing solutions already propose to disambiguate acked packets from rebuilt packets <span>[<a href="#QUIC-FEC" class="xref">QUIC-FEC</a>]</span>. New signaling methods and FEC-recovery-aware congestion controls could be proposed. This would allow the design of adaptive coding rates.<a href="#section-6.2.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-3">Research question 3 : "Should we quantify the harm that a coded flow would induce on a non-coded flow ? How can this be reduced while still benefiting from advantages brought by FEC ?"<a href="#section-6.2.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-4">Research question 4 : "If transport and FEC senders are collocated and close to the client, and FEC is applied only on the last mile, e.g. to ignore losses on a noisy wireless link, would this raise fairness issues ?"<a href="#section-6.2.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.2.2-5">Research question 5 : "Should we propose a generic API to allow dynamic interactions between a transport protocol and a coding scheme ? This should consider existing APIs between application and transport layers."<a href="#section-6.2.2-5" class="pilcrow">¶</a></p>
+</section>
+</section>
+<section id="section-6.3">
+        <h3 id="name-recommendations-and-advice-">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-recommendations-and-advice-" class="section-name selfRef">Recommendations and advice for evaluating coding mechanisms</a>
         </h3>
-<p id="section-7.3-1">The contribution to research questions should be mapped following the organization of this document. Otherwise, this may lead to wrong assumptions on the validity of the proposal and wrong ideas about the relevance of coding for a given use case.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
-<p id="section-7.3-2">The discussion provided in this document aims at encouraging the research community to also consider congestion control aspects when proposing and comparing FEC coding solutions in communication systems. As one example, this draft proposes discussions on the impact of the proposed FEC solution on congestion control, especially loss-based congestion control mechanisms. When a research work aims at improving the throughput by hiding the packet loss signal from the congestion control, the authors should 1) discuss the advantages of using the proposed FEC solution compared to replacing the congestion control by one that ignores a portion of the encountered losses, 2) critically discuss the impact of hiding packet loss from the congestion control mechanism.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
+<p id="section-6.3-1">Research Recommendation 1: "From a congestion control point-of-view, a repaired packet must be considered as a lost packet. This does not apply to the usage of FEC on a path that is known to be lossy."<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.3-2">Research Recommendation 2: "New research contributions should be mapped following the organization of this document (above, below, in the congestion control) and should consider congestion control aspects when proposing and comparing FEC coding solutions in communication systems."<a href="#section-6.3-2" class="pilcrow">¶</a></p>
+<p id="section-6.3-3">Research Recommendation 3: "When a research work aims at improving throughput by hiding the packet loss signal from congestion control (e.g., because the path between the sender and receiver is known to consist of a noisy wireless link), the authors should 1) discuss the advantages of using the proposed FEC solution compared to replacing the congestion control by one that ignores a portion of the encountered losses, 2) critically discuss the impact of hiding packet loss from the congestion control mechanism."<a href="#section-6.3-3" class="pilcrow">¶</a></p>
 </section>
 </section>
 </div>
 <div id="sec_acknowledgements">
-<section id="section-8">
+<section id="section-7">
       <h2 id="name-acknowledgements">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-acknowledgements" class="section-name selfRef">Acknowledgements</a>
       </h2>
-<p id="section-8-1">Many thanks to Spencer Dawkins, Dave Oran, Carsten Bormann, Vincent Roca and Marie-Jose Montpetit for their useful comments that helped improve the document.<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">Many thanks to Spencer Dawkins, Dave Oran, Carsten Bormann, Vincent Roca and Marie-Jose Montpetit for their useful comments that helped improve the document.<a href="#section-7-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec_IANA">
-<section id="section-9">
+<section id="section-8">
       <h2 id="name-iana-considerations">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-9-1">This memo includes no request to IANA.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-8-1">This memo includes no request to IANA.<a href="#section-8-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec_ecurity">
-<section id="section-10">
+<section id="section-9">
       <h2 id="name-security-considerations">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-10-1">FEC and CC schemes can contribute to DoS attacks. This is not specific to this document.<a href="#section-10-1" class="pilcrow">¶</a></p>
-<p id="section-10-2">In case of FEC below the transport, the aggregate rate of source and repair packets may exceed the rate at which a congestion control mechanism allows an application to send. This could result in an application obtaining more
-       than its fair share of the network capacity.<a href="#section-10-2" class="pilcrow">¶</a></p>
+<p id="section-9-1">FEC and CC schemes can contribute to DoS attacks. This is not specific to this document.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-2">In case of FEC below the transport, the aggregate rate of source and repair packets may exceed the rate at which a congestion control mechanism allows an application to send. This could result in an application obtaining more
+       than its fair share of the network capacity.<a href="#section-9-2" class="pilcrow">¶</a></p>
 </section>
 </div>
-<section id="section-11">
+<section id="section-10">
       <h2 id="name-informative-references">
-<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
       </h2>
 <dl class="references">
+<dt id="BEYONDJAIN">[BEYONDJAIN]</dt>
+      <dd>
+<span class="refAuthor">Ware (et al.), R.</span>, <span class="refTitle">"Beyond Jain's Fairness Index: Setting the Bar For The Deployment of Congestion Control Algorithms"</span>, <span class="seriesInfo">HotNets '19 10.1145/3365609.3365855</span>, <time datetime="2019" class="refDate">2019</time>. </dd>
+<dd class="break"></dd>
 <dt id="CTCP">[CTCP]</dt>
       <dd>
 <span class="refAuthor">Kim (et al.), M.</span>, <span class="refTitle">"Network Coded TCP (CTCP)"</span>, <span class="seriesInfo">arXiv 1212.2291v3</span>, <time datetime="2013" class="refDate">2013</time>. </dd>
@@ -1551,11 +1663,15 @@ address div.right {
 <dd class="break"></dd>
 <dt id="I-D.detchart-nwcrg-tetrys">[I-D.detchart-nwcrg-tetrys]</dt>
       <dd>
-<span class="refAuthor">Detchart, J.</span><span class="refAuthor">, Lochin, E.</span><span class="refAuthor">, Lacan, J.</span><span class="refAuthor">, and V. Roca</span>, <span class="refTitle">"Tetrys, an On-the-Fly Network Coding protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-detchart-nwcrg-tetrys-05</span>, <time datetime="2020-02-27" class="refDate">27 February 2020</time>, <span>&lt;<a href="http://www.ietf.org/internet-drafts/draft-detchart-nwcrg-tetrys-05.txt">http://www.ietf.org/internet-drafts/draft-detchart-nwcrg-tetrys-05.txt</a>&gt;</span>. </dd>
+<span class="refAuthor">Detchart, J.</span>, <span class="refAuthor">Lochin, E.</span>, <span class="refAuthor">Lacan, J.</span>, and <span class="refAuthor">V. Roca</span>, <span class="refTitle">"Tetrys, an On-the-Fly Network Coding protocol"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-detchart-nwcrg-tetrys-06</span>, <time datetime="2020-12-05" class="refDate">5 December 2020</time>, <span>&lt;<a href="http://www.ietf.org/internet-drafts/draft-detchart-nwcrg-tetrys-06.txt">http://www.ietf.org/internet-drafts/draft-detchart-nwcrg-tetrys-06.txt</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="I-D.ietf-quic-datagram">[I-D.ietf-quic-datagram]</dt>
+      <dd>
+<span class="refAuthor">Pauly, T.</span>, <span class="refAuthor">Kinnear, E.</span>, and <span class="refAuthor">D. Schinazi</span>, <span class="refTitle">"An Unreliable Datagram Extension to QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-quic-datagram-01</span>, <time datetime="2020-08-24" class="refDate">24 August 2020</time>, <span>&lt;<a href="http://www.ietf.org/internet-drafts/draft-ietf-quic-datagram-01.txt">http://www.ietf.org/internet-drafts/draft-ietf-quic-datagram-01.txt</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="I-D.swett-nwcrg-coding-for-quic">[I-D.swett-nwcrg-coding-for-quic]</dt>
       <dd>
-<span class="refAuthor">Swett, I.</span><span class="refAuthor">, Montpetit, M.</span><span class="refAuthor">, Roca, V.</span><span class="refAuthor">, and F. Michel</span>, <span class="refTitle">"Coding for QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-swett-nwcrg-coding-for-quic-04</span>, <time datetime="2020-03-09" class="refDate">9 March 2020</time>, <span>&lt;<a href="http://www.ietf.org/internet-drafts/draft-swett-nwcrg-coding-for-quic-04.txt">http://www.ietf.org/internet-drafts/draft-swett-nwcrg-coding-for-quic-04.txt</a>&gt;</span>. </dd>
+<span class="refAuthor">Swett, I.</span>, <span class="refAuthor">Montpetit, M.</span>, <span class="refAuthor">Roca, V.</span>, and <span class="refAuthor">F. Michel</span>, <span class="refTitle">"Coding for QUIC"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-swett-nwcrg-coding-for-quic-04</span>, <time datetime="2020-03-09" class="refDate">9 March 2020</time>, <span>&lt;<a href="http://www.ietf.org/internet-drafts/draft-swett-nwcrg-coding-for-quic-04.txt">http://www.ietf.org/internet-drafts/draft-swett-nwcrg-coding-for-quic-04.txt</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="NCTCP">[NCTCP]</dt>
       <dd>
@@ -1567,11 +1683,11 @@ address div.right {
 <dd class="break"></dd>
 <dt id="RFC3758">[RFC3758]</dt>
       <dd>
-<span class="refAuthor">Stewart, R.</span><span class="refAuthor">, Ramalho, M.</span><span class="refAuthor">, Xie, Q.</span><span class="refAuthor">, Tuexen, M.</span><span class="refAuthor">, and P. Conrad</span>, <span class="refTitle">"Stream Control Transmission Protocol (SCTP) Partial Reliability Extension"</span>, <span class="seriesInfo">RFC 3758</span>, <span class="seriesInfo">DOI 10.17487/RFC3758</span>, <time datetime="2004-05" class="refDate">May 2004</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc3758">https://www.rfc-editor.org/info/rfc3758</a>&gt;</span>. </dd>
+<span class="refAuthor">Stewart, R.</span>, <span class="refAuthor">Ramalho, M.</span>, <span class="refAuthor">Xie, Q.</span>, <span class="refAuthor">Tuexen, M.</span>, and <span class="refAuthor">P. Conrad</span>, <span class="refTitle">"Stream Control Transmission Protocol (SCTP) Partial Reliability Extension"</span>, <span class="seriesInfo">RFC 3758</span>, <span class="seriesInfo">DOI 10.17487/RFC3758</span>, <time datetime="2004-05" class="refDate">May 2004</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc3758">https://www.rfc-editor.org/info/rfc3758</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC4340">[RFC4340]</dt>
       <dd>
-<span class="refAuthor">Kohler, E.</span><span class="refAuthor">, Handley, M.</span><span class="refAuthor">, and S. Floyd</span>, <span class="refTitle">"Datagram Congestion Control Protocol (DCCP)"</span>, <span class="seriesInfo">RFC 4340</span>, <span class="seriesInfo">DOI 10.17487/RFC4340</span>, <time datetime="2006-03" class="refDate">March 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4340">https://www.rfc-editor.org/info/rfc4340</a>&gt;</span>. </dd>
+<span class="refAuthor">Kohler, E.</span>, <span class="refAuthor">Handley, M.</span>, and <span class="refAuthor">S. Floyd</span>, <span class="refTitle">"Datagram Congestion Control Protocol (DCCP)"</span>, <span class="seriesInfo">RFC 4340</span>, <span class="seriesInfo">DOI 10.17487/RFC4340</span>, <time datetime="2006-03" class="refDate">March 2006</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc4340">https://www.rfc-editor.org/info/rfc4340</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC5109">[RFC5109]</dt>
       <dd>
@@ -1579,23 +1695,35 @@ address div.right {
 <dd class="break"></dd>
 <dt id="RFC5681">[RFC5681]</dt>
       <dd>
-<span class="refAuthor">Allman, M.</span><span class="refAuthor">, Paxson, V.</span><span class="refAuthor">, and E. Blanton</span>, <span class="refTitle">"TCP Congestion Control"</span>, <span class="seriesInfo">RFC 5681</span>, <span class="seriesInfo">DOI 10.17487/RFC5681</span>, <time datetime="2009-09" class="refDate">September 2009</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5681">https://www.rfc-editor.org/info/rfc5681</a>&gt;</span>. </dd>
+<span class="refAuthor">Allman, M.</span>, <span class="refAuthor">Paxson, V.</span>, and <span class="refAuthor">E. Blanton</span>, <span class="refTitle">"TCP Congestion Control"</span>, <span class="seriesInfo">RFC 5681</span>, <span class="seriesInfo">DOI 10.17487/RFC5681</span>, <time datetime="2009-09" class="refDate">September 2009</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc5681">https://www.rfc-editor.org/info/rfc5681</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC6297">[RFC6297]</dt>
       <dd>
-<span class="refAuthor">Welzl, M.</span><span class="refAuthor"> and D. Ros</span>, <span class="refTitle">"A Survey of Lower-than-Best-Effort Transport Protocols"</span>, <span class="seriesInfo">RFC 6297</span>, <span class="seriesInfo">DOI 10.17487/RFC6297</span>, <time datetime="2011-06" class="refDate">June 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6297">https://www.rfc-editor.org/info/rfc6297</a>&gt;</span>. </dd>
+<span class="refAuthor">Welzl, M.</span> and <span class="refAuthor">D. Ros</span>, <span class="refTitle">"A Survey of Lower-than-Best-Effort Transport Protocols"</span>, <span class="seriesInfo">RFC 6297</span>, <span class="seriesInfo">DOI 10.17487/RFC6297</span>, <time datetime="2011-06" class="refDate">June 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6297">https://www.rfc-editor.org/info/rfc6297</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC6356">[RFC6356]</dt>
       <dd>
-<span class="refAuthor">Raiciu, C.</span><span class="refAuthor">, Handley, M.</span><span class="refAuthor">, and D. Wischik</span>, <span class="refTitle">"Coupled Congestion Control for Multipath Transport Protocols"</span>, <span class="seriesInfo">RFC 6356</span>, <span class="seriesInfo">DOI 10.17487/RFC6356</span>, <time datetime="2011-10" class="refDate">October 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6356">https://www.rfc-editor.org/info/rfc6356</a>&gt;</span>. </dd>
+<span class="refAuthor">Raiciu, C.</span>, <span class="refAuthor">Handley, M.</span>, and <span class="refAuthor">D. Wischik</span>, <span class="refTitle">"Coupled Congestion Control for Multipath Transport Protocols"</span>, <span class="seriesInfo">RFC 6356</span>, <span class="seriesInfo">DOI 10.17487/RFC6356</span>, <time datetime="2011-10" class="refDate">October 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6356">https://www.rfc-editor.org/info/rfc6356</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8095">[RFC8095]</dt>
+      <dd>
+<span class="refAuthor">Fairhurst, G., Ed.</span>, <span class="refAuthor">Trammell, B., Ed.</span>, and <span class="refAuthor">M. Kuehlewind, Ed.</span>, <span class="refTitle">"Services Provided by IETF Transport Protocols and Congestion Control Mechanisms"</span>, <span class="seriesInfo">RFC 8095</span>, <span class="seriesInfo">DOI 10.17487/RFC8095</span>, <time datetime="2017-03" class="refDate">March 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8095">https://www.rfc-editor.org/info/rfc8095</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8406">[RFC8406]</dt>
       <dd>
-<span class="refAuthor">Adamson, B.</span><span class="refAuthor">, Adjih, C.</span><span class="refAuthor">, Bilbao, J.</span><span class="refAuthor">, Firoiu, V.</span><span class="refAuthor">, Fitzek, F.</span><span class="refAuthor">, Ghanem, S.</span><span class="refAuthor">, Lochin, E.</span><span class="refAuthor">, Masucci, A.</span><span class="refAuthor">, Montpetit, M-J.</span><span class="refAuthor">, Pedersen, M.</span><span class="refAuthor">, Peralta, G.</span><span class="refAuthor">, Roca, V., Ed.</span><span class="refAuthor">, Saxena, P.</span><span class="refAuthor">, and S. Sivakumar</span>, <span class="refTitle">"Taxonomy of Coding Techniques for Efficient Network Communications"</span>, <span class="seriesInfo">RFC 8406</span>, <span class="seriesInfo">DOI 10.17487/RFC8406</span>, <time datetime="2018-06" class="refDate">June 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8406">https://www.rfc-editor.org/info/rfc8406</a>&gt;</span>. </dd>
+<span class="refAuthor">Adamson, B.</span>, <span class="refAuthor">Adjih, C.</span>, <span class="refAuthor">Bilbao, J.</span>, <span class="refAuthor">Firoiu, V.</span>, <span class="refAuthor">Fitzek, F.</span>, <span class="refAuthor">Ghanem, S.</span>, <span class="refAuthor">Lochin, E.</span>, <span class="refAuthor">Masucci, A.</span>, <span class="refAuthor">Montpetit, M-J.</span>, <span class="refAuthor">Pedersen, M.</span>, <span class="refAuthor">Peralta, G.</span>, <span class="refAuthor">Roca, V., Ed.</span>, <span class="refAuthor">Saxena, P.</span>, and <span class="refAuthor">S. Sivakumar</span>, <span class="refTitle">"Taxonomy of Coding Techniques for Efficient Network Communications"</span>, <span class="seriesInfo">RFC 8406</span>, <span class="seriesInfo">DOI 10.17487/RFC8406</span>, <time datetime="2018-06" class="refDate">June 2018</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8406">https://www.rfc-editor.org/info/rfc8406</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8680">[RFC8680]</dt>
+      <dd>
+<span class="refAuthor">Roca, V.</span> and <span class="refAuthor">A. Begen</span>, <span class="refTitle">"Forward Error Correction (FEC) Framework Extension to Sliding Window Codes"</span>, <span class="seriesInfo">RFC 8680</span>, <span class="seriesInfo">DOI 10.17487/RFC8680</span>, <time datetime="2020-01" class="refDate">January 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8680">https://www.rfc-editor.org/info/rfc8680</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8681">[RFC8681]</dt>
+      <dd>
+<span class="refAuthor">Roca, V.</span> and <span class="refAuthor">B. Teibi</span>, <span class="refTitle">"Sliding Window Random Linear Code (RLC) Forward Erasure Correction (FEC) Schemes for FECFRAME"</span>, <span class="seriesInfo">RFC 8681</span>, <span class="seriesInfo">DOI 10.17487/RFC8681</span>, <time datetime="2020-01" class="refDate">January 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8681">https://www.rfc-editor.org/info/rfc8681</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8699">[RFC8699]</dt>
       <dd>
-<span class="refAuthor">Islam, S.</span><span class="refAuthor">, Welzl, M.</span><span class="refAuthor">, and S. Gjessing</span>, <span class="refTitle">"Coupled Congestion Control for RTP Media"</span>, <span class="seriesInfo">RFC 8699</span>, <span class="seriesInfo">DOI 10.17487/RFC8699</span>, <time datetime="2020-01" class="refDate">January 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8699">https://www.rfc-editor.org/info/rfc8699</a>&gt;</span>. </dd>
+<span class="refAuthor">Islam, S.</span>, <span class="refAuthor">Welzl, M.</span>, and <span class="refAuthor">S. Gjessing</span>, <span class="refTitle">"Coupled Congestion Control for RTP Media"</span>, <span class="seriesInfo">RFC 8699</span>, <span class="seriesInfo">DOI 10.17487/RFC8699</span>, <time datetime="2020-01" class="refDate">January 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8699">https://www.rfc-editor.org/info/rfc8699</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TENTET">[TENTET]</dt>
     <dd>
